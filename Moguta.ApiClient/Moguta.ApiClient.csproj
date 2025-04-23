@@ -5,18 +5,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn><!-- Отключаем предупреждение о недостающих XML-комментариях для приватных членов -->
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <!-- Отключаем предупреждение о недостающих XML-комментариях для приватных членов -->
   </PropertyGroup>
 
   <ItemGroup>
     <!-- Зависимости для HTTP клиента, DI, логирования и JSON -->
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.4" />  
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.4" />  
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.4" /> 
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.4" />  
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" /> 
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.4.0" /> 
-    <PackageReference Include="System.Text.Json" Version="9.0.4" /> 
+    <PackageReference Include="System.Text.Json" Version="9.0.4" />
   </ItemGroup>
 
   <ItemGroup>
