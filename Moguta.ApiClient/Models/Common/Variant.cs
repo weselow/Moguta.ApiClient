@@ -11,42 +11,63 @@ public class Variant
     [JsonConverter(typeof(StringToLongConverter))] // Строка
     public long ProductId { get; set; } // Сделаем non-nullable
 
-    [JsonPropertyName("title_variant")]
-    public string? TitleVariant { get; set; }
+    /// <summary>
+    /// заголовок варианта
+    /// </summary>
+    [JsonPropertyName("title_variant")] public string? TitleVariant { get; set; }
 
-    [JsonPropertyName("image")]
-    public string? Image { get; set; } // Может быть null
+    /// <summary>
+    /// ссылка на изображение
+    /// </summary>
+    [JsonPropertyName("image")] public string? Image { get; set; } // Может быть null
 
-    [JsonPropertyName("sort")]
-    [JsonConverter(typeof(StringToIntConverter))] // Строка
+    [JsonPropertyName("sort")] [JsonConverter(typeof(StringToIntConverter))] // Строка
     public int Sort { get; set; } // Сделаем non-nullable
 
-    [JsonPropertyName("price")]
-    [JsonConverter(typeof(StringToDecimalConverter))] // Строка
+    /// <summary>
+    /// цена
+    /// </summary>
+    [JsonPropertyName("price")] [JsonConverter(typeof(StringToDecimalConverter))] // Строка
     public decimal Price { get; set; }
 
+    /// <summary>
+    /// старая цена
+    /// </summary>
     [JsonPropertyName("old_price")]
     [JsonConverter(typeof(StringToNullableDecimalConverter))] // Пустая строка
     public decimal? OldPrice { get; set; }
 
+    /// <summary>
+    /// количество
+    /// </summary>
     [JsonPropertyName("count")]
     [JsonConverter(typeof(StringToDecimalConverter))] // Строка "0" или "-1"
     public decimal Count { get; set; }
 
-    [JsonPropertyName("code")]
-    public string Code { get; set; } = string.Empty;
+    /// <summary>
+    /// артикул
+    /// </summary>
+    [JsonPropertyName("code")] public string Code { get; set; } = string.Empty;
 
     [JsonPropertyName("activity")]
     [JsonConverter(typeof(IntToBoolConverter))] // Строка "1"
     public bool Activity { get; set; } = true;
 
+    /// <summary>
+    /// вес товара
+    /// </summary>
     [JsonPropertyName("weight")]
     [JsonConverter(typeof(StringToDecimalConverter))] // Строка "0"
     public decimal Weight { get; set; } // Сделаем non-nullable, т.к. всегда "0" в примере
 
-    [JsonPropertyName("currency_iso")]
-    public string? CurrencyIso { get; set; } // "RUR"
+    /// <summary>
+    /// символьный код валюты
+    /// </summary>
+    [JsonPropertyName("currency_iso")] public string? CurrencyIso { get; set; } // "RUR"
 
+    /// <summary>
+    /// цена в валюте магазина
+    /// </summary>
     [JsonPropertyName("price_course")]
     [JsonConverter(typeof(StringToDecimalConverter))] // Строка
     public decimal PriceCourse { get; set; } // Сделаем non-nullable
@@ -54,10 +75,16 @@ public class Variant
     [JsonPropertyName("1c_id")]
     public string? ExternalId1C { get; set; } // null
 
+    /// <summary>
+    /// id цвета товара (если есть) от характеристики
+    /// </summary>
     [JsonPropertyName("color")]
     [JsonConverter(typeof(StringToNullableLongConverter))] // Строка
     public long? ColorId { get; set; }
 
+    /// <summary>
+    /// id размера товара (если есть) от характеристики
+    /// </summary>
     [JsonPropertyName("size")]
     [JsonConverter(typeof(StringToNullableLongConverter))] // Строка
     public long? SizeId { get; set; }

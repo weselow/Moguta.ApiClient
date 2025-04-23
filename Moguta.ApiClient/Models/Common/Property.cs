@@ -9,11 +9,16 @@ public class Property
     [JsonConverter(typeof(StringToLongConverter))]
     public long Id { get; set; } // Сделаем non-nullable
 
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty; // Название характеристики
+    /// <summary>
+    /// название характеристики
+    /// </summary>
+    [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")]
-    public string Type { get; set; } = string.Empty; // size, color, assortmentCheckBox etc.
+    /// <summary>
+    /// тип хварактеристики
+    /// </summary>
+    /// <remarks>В справке встретились: string, textarea</remarks>
+    [JsonPropertyName("type")] public string Type { get; set; } = string.Empty; // size, color, assortmentCheckBox etc.
 
     [JsonPropertyName("data")]
     public List<PropertyData>? Data { get; set; } // Список значений этой характеристики
