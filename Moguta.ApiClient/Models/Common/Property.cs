@@ -20,8 +20,13 @@ public class Property
     /// <remarks>В справке встретились: string, textarea</remarks>
     [JsonPropertyName("type")] public string Type { get; set; } = string.Empty; // size, color, assortmentCheckBox etc.
 
+    /// <summary>
+    /// Список значений этой характеристики
+    /// </summary>
     [JsonPropertyName("data")]
-    public List<PropertyData>? Data { get; set; } // Список значений этой характеристики
+    [JsonConverter(typeof(NullableListConverter<PropertyData>))] 
+    public List<PropertyData>? Data { get; set; } 
+
 
     [JsonPropertyName("all_category")] // Непонятно, bool или int
     [JsonConverter(typeof(IntToBoolConverter))] // Предпол. bool
@@ -59,7 +64,7 @@ public class Property
     public long? GroupId { get; set; }
 
     // Поля из запроса importProduct (оставляем на случай использования DTO для отправки)
-    // [JsonPropertyName("value")] public string Value { get; set; } = string.Empty;
+    [JsonPropertyName("value")] public string Value { get; set; } = string.Empty;
     // Убираем value, т.к. при получении оно внутри data[].name
 
     // Убираем поля, которых нет в ответе getProduct (type_view, property_margin, prop_val_id)

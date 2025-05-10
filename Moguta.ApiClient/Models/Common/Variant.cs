@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Moguta.ApiClient.Infrastructure.Converters;
 
+namespace Moguta.ApiClient.Models.Common;
 public class Variant
 {
     [JsonPropertyName("id")]
@@ -27,7 +28,8 @@ public class Variant
     /// <summary>
     /// цена
     /// </summary>
-    [JsonPropertyName("price")] [JsonConverter(typeof(StringToDecimalConverter))] // Строка
+    [JsonPropertyName("price")] 
+    [JsonConverter(typeof(StringToDecimalConverter))] // Строка
     public decimal Price { get; set; }
 
     /// <summary>

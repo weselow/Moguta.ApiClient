@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Moguta.ApiClient.Infrastructure.Converters;
-using Moguta.ApiClient.Models.Common;
+
+namespace Moguta.ApiClient.Models.Common;
 
 public class Product
 {
@@ -30,16 +31,20 @@ public class Product
     [JsonPropertyName("title")] public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// описание товара
+    /// Описание товара
     /// </summary>
-    [JsonPropertyName("description")] public string? Description { get; set; }
+    [JsonPropertyName("description")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Description { get; set; }
 
     /// <summary>
     /// краткое описание товара
     /// </summary>
-    [JsonPropertyName("short_description")] public string? ShortDescription { get; set; }
+    [JsonPropertyName("short_description")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ShortDescription { get; set; }
 
-   
+
 
 
     /// <summary>
@@ -49,7 +54,7 @@ public class Product
     [JsonPropertyName("url")]
     public string Url { get; set; } = string.Empty;
 
-    
+
 
     /// <summary>
     /// артикул
@@ -168,7 +173,7 @@ public class Product
     /// сcылка на электронный товар
     /// </summary>
     [JsonPropertyName("link_electro")] public string? LinkElectro { get; set; } // null
-    
+
 
     [JsonPropertyName("yml_sales_notes")]
     public string? YmlSalesNotes { get; set; } // null
@@ -183,7 +188,7 @@ public class Product
     [JsonPropertyName("related_cat")]
     public string? RelatedCat { get; set; }
 
-    
+
 
     [JsonPropertyName("last_updated")]
     public DateTimeOffset? LastUpdated { get; set; } // Стандартный парсер должен справиться с "yyyy-MM-dd HH:mm:ss"
@@ -210,7 +215,6 @@ public class Product
     /// </summary>
     [JsonPropertyName("property")]
     public List<Property>? Property { get; set; }
-
 
 
     // Убираем поля, которых нет в ответе: category_url, images, yml, opf_*

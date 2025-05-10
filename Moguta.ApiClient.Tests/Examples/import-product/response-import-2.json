@@ -1,0 +1,130 @@
+{
+  "status": "OK",
+  "response": {
+    "products": [
+      {
+        "id": "2460",
+        "sort": null,
+        "cat_id": "5",
+        "title": "Резистор тестовый ccaa4f13 (10 кОм, 0.25 Вт)",
+        "description": "<p>Тестовый резистор SMD ccaa4f13 для поверхностного монтажа.</p>\r\n<ul>\r\n  <li>Сопротивление: 10 кОм</li>\r\n  <li>Мощность: 0.25 Вт</li>\r\n  <li>Точность: 5%</li>\r\n  <li>Типоразмер: 0805</li>\r\n</ul>\r\n<p>Произведен в рамках интеграционного теста.</p>",
+        "price": "5.75",
+        "url": "resistor-test-ccaa4f13",
+        "image_url": "10260e8e36a6a9cb95d654d4b14c0ead_2025-04-24_11-32-58.jpeg|ceb8a6613bb311e777dad4a76fde4b80_2025-04-24_11-32-58.jpeg",
+        "code": "RES-TEST-ccaa4f13",
+        "count": "150",
+        "activity": "1",
+        "meta_title": "Купить Тестовый Резистор ccaa4f13 10 кОм",
+        "meta_keywords": "резистор, smd, 0805, 10k, ccaa4f13, тест",
+        "meta_desc": "Интеграционный тест: резистор ccaa4f13 с сопротивлением 10 кОм и мощностью 0.25 Вт.",
+        "old_price": "6.5",
+        "recommend": "0",
+        "new": "1",
+        "related": null,
+        "inside_cat": null,
+        "1c_id": "",
+        "weight": "0.002",
+        "link_electro": null,
+        "currency_iso": null,
+        "price_course": "0",
+        "image_title": "Вид сверху|Схема",
+        "image_alt": "Резистор тестовый|Схема резистора",
+        "yml_sales_notes": null,
+        "count_buy": "0",
+        "system_set": null,
+        "related_cat": null,
+        "short_description": "Тестовый резистор ccaa4f13, 10 кОм, 5%, 0.25 Вт, SMD 0805",
+        "last_updated": "2025-04-24 11:32:59",
+        "unit": "шт.",
+        "weight_unit": null,
+        "multiplicity": "0",
+        "storage_count": "0",
+        "property": [
+          {
+            "id": "48",
+            "name": "Комплектация",
+            "type": "assortment",
+            "unit": ""
+          },
+          {
+            "id": "49",
+            "name": "Размер изделия",
+            "type": "assortment",
+            "unit": "мм"
+          },
+          {
+            "id": "50",
+            "name": "Тип двери",
+            "type": "assortmentCheckBox",
+            "unit": ""
+          },
+          {
+            "id": "51",
+            "name": "Толщина полотна",
+            "type": "string",
+            "unit": ""
+          },
+          {
+            "id": "52",
+            "name": "Вид отделки",
+            "type": "string",
+            "unit": ""
+          },
+          {
+            "id": "53",
+            "name": "Стекло",
+            "type": "string",
+            "unit": ""
+          },
+          {
+            "id": "54",
+            "name": "Мощность",
+            "type": "string",
+            "unit": "Вт"
+          },
+          {
+            "id": "57",
+            "name": "Сопротивление",
+            "type": "string",
+            "unit": ""
+          },
+          {
+            "id": "58",
+            "name": "Точность (%)",
+            "type": "string",
+            "unit": ""
+          },
+          {
+            "id": "59",
+            "name": "Типоразмер",
+            "type": "string",
+            "unit": ""
+          },
+          {
+            "id": "60",
+            "name": "Производитель",
+            "type": "string",
+            "unit": ""
+          },
+          {
+            "id": "61",
+            "name": "Примечание",
+            "type": "textarea",
+            "unit": ""
+          },
+          {
+            "id": "62",
+            "name": "Производитель1",
+            "type": "string",
+            "unit": ""
+          }
+        ]
+      }
+    ],
+    "variants": 1,
+    "property": 1
+  },
+  "error": "0",
+  "sign": "11a6aa0fd0bdd2b0d7b0d52cc0fc99fd",
+  "workTime": "0.003 ms"
+}

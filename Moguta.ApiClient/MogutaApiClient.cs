@@ -139,6 +139,7 @@ public partial class MogutaApiClient : IMogutaApiClient
             throw new MogutaApiException($"Запрос к API прерван ({reason}) для метода '{apiMethod}'.", apiMethod, null, null, ex);
         }
 
+        //todo получение ответа
         string responseBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         _logger.LogInformation("Получен ответ от API. Метод: {ApiMethod}, Status Code: {StatusCode}", apiMethod, response.StatusCode);
         if (_logger.IsEnabled(LogLevel.Debug))
