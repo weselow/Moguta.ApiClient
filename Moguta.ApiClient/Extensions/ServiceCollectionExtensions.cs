@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Moguta.ApiClient.Abstractions; // Подключаем интерфейс
-using System.Net; // Для DecompressionMethods
+using Moguta.ApiClient.Abstractions;  
+using System.Net;
+using NLog;
+using Polly;
+
 
 namespace Moguta.ApiClient.Extensions;
 
@@ -36,20 +39,30 @@ public static class ServiceCollectionExtensions
         // Регистрация HttpClient и типизированного клиента
         // Регистрируем реализацию против интерфейса
         return services.AddHttpClient<IMogutaApiClient, MogutaApiClient>()
+            
             .ConfigureHttpClient((serviceProvider, client) =>
             {
                 // BaseAddress и Timeout настраиваются в конструкторе MogutaApiClient из опций
             })
-            // Настраиваем обработчик сообщений
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
             {
-                // Включаем автоматическую распаковку GZip/Deflate, если сервер их поддерживает
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                // Здесь можно добавить другие настройки обработчика при необходимости
-                // (например, прокси, обработка сертификатов)
-            });
-        // Здесь можно добавить политики отказоустойчивости, например, Polly
-        // .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(...))
+                AutomaticDecompression = DecompressionMethods.All,
+                AllowAutoRedirect = true,
+                PooledConnectionIdleTimeout = TimeSpan.Zero
+  
+            })
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.WaitAndRetryAsync(
+                    3, // Количество попыток
+                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), // Экспоненциальная задержка
+                    onRetry: (outcome, timespan, retryAttempt, context) =>
+                    {
+                        var logger = LogManager.GetCurrentClassLogger();
+                        logger.Warn("Задержка на {Delay} перед попыткой {RetryAttempt} вызова Gemini API из-за {StatusCode} {tags}",
+                            timespan, retryAttempt, outcome.Result?.StatusCode, new[] { "MogutaApiClient" });
+                    }
+                )
+            );
     }
 
     /// <summary>

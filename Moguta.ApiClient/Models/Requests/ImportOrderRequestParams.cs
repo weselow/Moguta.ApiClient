@@ -13,12 +13,12 @@ public class ImportOrderRequestParams
     /// Рекомендуемый размер пакета - до 100 записей.
     /// </summary>
     /// <remarks>
-    /// **Важно:** Для передачи позиций заказа используйте свойство <c>OrderItems</c> в объектах <see cref="Order"/>.
+    /// **Важно:** Для передачи позиций заказа используйте свойство <c>OrderItems</c> в объектах <see cref="MogutaOrder"/>.
     /// Клиент автоматически сериализует <c>OrderItems</c> в JSON и отправит в поле 'order_content'.
     /// Убедитесь, что API сервера настроен на прием JSON в этом поле.
     /// </remarks>
     [JsonPropertyName("orders")]
-    public List<Order> Orders { get; set; } = [];
+    public List<MogutaOrder> Orders { get; set; } = [];
 
     // Флаг 'enableUpdate' не показан в примерах для заказов,
     // обновление, вероятно, происходит неявно при наличии ID.

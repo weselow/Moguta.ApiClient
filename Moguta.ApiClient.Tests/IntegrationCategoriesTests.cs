@@ -110,12 +110,12 @@ public class IntegrationCategoriesTests
         _logger.LogInformation("Запуск теста GetCategoriesAsync_RealApi_ShouldReturnCategories...");
 
         // Arrange
-        var requestParams = new GetCategoryRequestParams
+        var requestParams = new GetMogutaCategoryRequestParams
         {
             Page = 1,
             Count = 50
         };
-        List<Category>? categories = null;
+        List<MogutaCategory>? categories = null;
 
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -147,12 +147,12 @@ public class IntegrationCategoriesTests
         _logger.LogInformation("Запуск теста GetCategoriesAsync_RealApi_ShouldReturnCategories...");
 
         // Arrange
-        var requestParams = new GetCategoryRequestParams
+        var requestParams = new GetMogutaCategoryRequestParams
         {
             Page = 1,
             //Count = 50
         };
-        List<Category>? categories = null;
+        List<MogutaCategory>? categories = null;
 
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -187,11 +187,11 @@ public class IntegrationCategoriesTests
         var initialTitle = $"Тест Кат Созд {uniqueId}";
         var initialUrl = $"test-cat-create-{uniqueId}";
         var updatedTitle = $"Тест Кат Обновл {uniqueId}"; // Новое название для обновления
-        var initialCategory = new Category
+        var initialCategory = new MogutaCategory
         {
             Title = initialTitle,
             Url = initialUrl,
-            Parent = 0,
+            Parent = 13,
             Activity = true,
             Invisible = false,
             Export = true,
@@ -203,12 +203,12 @@ public class IntegrationCategoriesTests
         // --- Act 1: Создание ---
         var createException = await Record.ExceptionAsync(async () =>
         {
-            var importResult = await _apiClient!.ImportCategoryAsync(new List<Category> { initialCategory });
+            var importResult = await _apiClient!.ImportCategoryAsync(new List<MogutaCategory> { initialCategory });
             Assert.NotNull(importResult);
             Assert.Contains("Импорт завершен", importResult, StringComparison.OrdinalIgnoreCase);
 
             await Task.Delay(500);
-            var searchParams = new GetCategoryRequestParams { Urls = new List<string> { initialUrl } };
+            var searchParams = new GetMogutaCategoryRequestParams { Urls = new List<string> { initialUrl } };
             var found = await _apiClient!.GetCategoryAsync(searchParams);
             createdCategoryId = found?.FirstOrDefault()?.Id;
         });
@@ -220,7 +220,7 @@ public class IntegrationCategoriesTests
         _logger.LogInformation("Этап создания в тесте CreateUpdateDeleteCategory: Категория создана, ID={CatId}", createdCategoryId);
 
         // --- Arrange 2: Подготовка к обновлению ---
-        var categoryToUpdate = new Category
+        var categoryToUpdate = new MogutaCategory
         {
             Id = createdCategoryId.Value, // Указываем ID для обновления
             Title = updatedTitle,         // Меняем название
@@ -232,12 +232,12 @@ public class IntegrationCategoriesTests
 
         // --- Act 2: Обновление ---
         string? updateResult = null;
-        Category? updatedCategory = null;
+        MogutaCategory? updatedCategory = null;
         var updateException = await Record.ExceptionAsync(async () =>
         {
-            updateResult = await _apiClient!.ImportCategoryAsync(new List<Category> { categoryToUpdate });
+            updateResult = await _apiClient!.ImportCategoryAsync(new List<MogutaCategory> { categoryToUpdate });
             await Task.Delay(500);
-            var searchParams = new GetCategoryRequestParams { Ids = new List<long> { createdCategoryId.Value } }; // Ищем по ID
+            var searchParams = new GetMogutaCategoryRequestParams { Ids = new List<long> { createdCategoryId.Value } }; // Ищем по ID
             updatedCategory = (await _apiClient!.GetCategoryAsync(searchParams))?.FirstOrDefault();
         });
 
@@ -253,7 +253,7 @@ public class IntegrationCategoriesTests
 
         // --- Arrange 3: Подготовка к удалению ---
         string? deleteResult = null;
-        List<Category>? foundAfterDelete = null;
+        List<MogutaCategory>? foundAfterDelete = null;
 
         // --- Act 3: Удаление ---
         _logger.LogInformation("Этап удаления в тесте CreateUpdateDeleteCategory: Удаление категории ID={CatId}...", createdCategoryId.Value);
@@ -261,7 +261,7 @@ public class IntegrationCategoriesTests
         {
             deleteResult = await _apiClient!.DeleteCategoryAsync(new List<long> { createdCategoryId.Value });
             await Task.Delay(500);
-            var searchParamsCheck = new GetCategoryRequestParams { Ids = new List<long> { createdCategoryId.Value } };
+            var searchParamsCheck = new GetMogutaCategoryRequestParams { Ids = new List<long> { createdCategoryId.Value } };
             foundAfterDelete = await _apiClient!.GetCategoryAsync(searchParamsCheck);
         });
 
@@ -290,7 +290,7 @@ public class IntegrationCategoriesTests
         }
         // --- Arrange: Создание категории ---
         var uniqueId = Guid.NewGuid().ToString("N").Substring(0, 8);
-        var initialCategory = new Category
+        var initialCategory = new MogutaCategory
         {
             Title = $"Тест Кат Созд {uniqueId}",
             Url = $"test-cat-create-{uniqueId}",
@@ -311,8 +311,8 @@ public class IntegrationCategoriesTests
 
         string? deleteResult = null;
         var totalDelted = 0;
-        List<Category>? foundAfterDelete = null;
-        var searchParams = new GetCategoryRequestParams
+        List<MogutaCategory>? foundAfterDelete = null;
+        var searchParams = new GetMogutaCategoryRequestParams
         {
             Page = 1
         };  
@@ -360,7 +360,7 @@ public class IntegrationCategoriesTests
         var uniqueId = Guid.NewGuid().ToString("N").Substring(0, 8);
         var categoryName = $"Тест Категория {uniqueId}";
         var categoryUrl = $"test-cat-{uniqueId}";
-        var initialCategory = new Category
+        var initialCategory = new MogutaCategory
         {
             Title = categoryName,
             Url = categoryUrl,
@@ -375,7 +375,7 @@ public class IntegrationCategoriesTests
         _logger.LogInformation("Создание категории с именем '{Name}'...", categoryName);
         var createException1 = await Record.ExceptionAsync(async () =>
         {
-            var importResult = await _apiClient!.ImportCategoryAsync(new List<Category> { initialCategory });
+            var importResult = await _apiClient!.ImportCategoryAsync(new List<MogutaCategory> { initialCategory });
             Assert.NotNull(importResult);
             Assert.Contains("Импорт завершен", importResult, StringComparison.OrdinalIgnoreCase);
         });
@@ -386,7 +386,7 @@ public class IntegrationCategoriesTests
         _logger.LogInformation("Повторное создание категории с измененным полем Sort...");
         var createException2 = await Record.ExceptionAsync(async () =>
         {
-            var importResult = await _apiClient!.ImportCategoryAsync(new List<Category> { initialCategory });
+            var importResult = await _apiClient!.ImportCategoryAsync(new List<MogutaCategory> { initialCategory });
             Assert.NotNull(importResult);
             Assert.Contains("Импорт завершен", importResult, StringComparison.OrdinalIgnoreCase);
         });
@@ -394,10 +394,10 @@ public class IntegrationCategoriesTests
 
         // --- Act 3: Запрос категорий по имени ---
         _logger.LogInformation("Запрос категорий с именем '{Name}' по url...", categoryName);
-        List<Category>? matchingCategories = null;
+        List<MogutaCategory>? matchingCategories = null;
         var fetchException = await Record.ExceptionAsync(async () =>
         {
-            var requestParams = new GetCategoryRequestParams
+            var requestParams = new GetMogutaCategoryRequestParams
             {
                 Urls = new List<string> { categoryUrl }
             };

@@ -9,9 +9,9 @@ namespace Moguta.ApiClient.Infrastructure.Converters;
 /// Конвертирует поле 'yur_info' из JSON.
 /// Оно может быть либо булевым 'false', либо объектом OrderYurInfo.
 /// </summary>
-public class OrderYurInfoConverter : JsonConverter<OrderYurInfo?>
+public class OrderYurInfoConverter : JsonConverter<MogutaOrderYurInfo?>
 {
-    public override OrderYurInfo? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override MogutaOrderYurInfo? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.False)
         {
@@ -27,13 +27,13 @@ public class OrderYurInfoConverter : JsonConverter<OrderYurInfo?>
             // Десериализуем объект стандартно, удалив себя из опций
             var optionsWithoutThis = new JsonSerializerOptions(options);
             optionsWithoutThis.Converters.Remove(this);
-            return JsonSerializer.Deserialize<OrderYurInfo>(ref reader, optionsWithoutThis);
+            return JsonSerializer.Deserialize<MogutaOrderYurInfo>(ref reader, optionsWithoutThis);
         }
 
         throw new JsonException($"Неожиданный тип токена {reader.TokenType} для поля yur_info. Ожидался объект или false.");
     }
 
-    public override void Write(Utf8JsonWriter writer, OrderYurInfo? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, MogutaOrderYurInfo? value, JsonSerializerOptions options)
     {
         if (value == null)
         {

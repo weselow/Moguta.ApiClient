@@ -6,7 +6,7 @@ namespace Moguta.ApiClient.Models.Common;
 /// Представляет структурированные детали адреса внутри заказа.
 /// Основано на поле 'address_parts' в примере getOrder.
 /// </summary>
-public class OrderAddress
+public class MogutaOrderAddress
 {
     /// <summary>
     /// Получает или задает почтовый индекс.

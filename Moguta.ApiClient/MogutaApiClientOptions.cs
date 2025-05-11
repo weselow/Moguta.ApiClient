@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace Moguta.ApiClient;
 
@@ -40,7 +41,7 @@ public class MogutaApiClientOptions
     /// Значение по умолчанию: <c>true</c>. Отключение проверки крайне не рекомендуется из соображений безопасности.
     /// </summary>
     /// <value><c>true</c> для проверки подписей; иначе <c>false</c>.</value>
-    public bool ValidateApiResponseSignature { get; set; } = true;
+    public bool ValidateApiResponseSignature { get; set; } = false;
 
     /// <summary>
     /// Получает или задает необязательный таймаут для API запросов, выполняемых HttpClient.
@@ -77,4 +78,15 @@ public class MogutaApiClientOptions
     /// </summary>
     public int MaxGetOrderPerPageCount { get; set; } = 250;
     public int MaxImportOrderBatchSize { get; set; } = 100;
+
+
+    public void UpdateFrom<T>(T other) where T : MogutaApiClientOptions
+    {
+        foreach (PropertyInfo prop in this.GetType().GetProperties())
+        {
+            if (!prop.CanWrite) continue; // Проверяем, можно ли записывать в свойство
+            var value = prop.GetValue(other);
+            prop.SetValue(this, value);
+        }
+    }
 }

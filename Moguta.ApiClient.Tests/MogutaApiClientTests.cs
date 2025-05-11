@@ -135,9 +135,9 @@ public class MogutaApiClientTests : IDisposable
     {
         // Arrange
         var requestParams = new GetProductRequestParams { Page = 1, Count = 2 };
-        var expectedProducts = new List<Product> {
-            new Product { Id = 1, Title = "Товар 1", Code="P1", CatId=1, Url="p1", Price=10, Count=5, Activity=true },
-            new Product { Id = 2, Title = "Товар 2", Code="P2", CatId=1, Url="p2", Price=20, Count=10, Activity=true }
+        var expectedProducts = new List<MogutaProduct> {
+            new MogutaProduct { Id = 1, Title = "Товар 1", Code="P1", CatId=1, Url="p1", Price=10, Count=5, Activity=true },
+            new MogutaProduct { Id = 2, Title = "Товар 2", Code="P2", CatId=1, Url="p2", Price=20, Count=10, Activity=true }
         };
         string paramsJson = SerializationHelper.Serialize(requestParams); // {"page":1,"count":2}
         // Используем обновленную подпись

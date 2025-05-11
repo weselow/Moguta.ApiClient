@@ -115,7 +115,7 @@ public class IntegrationUsersTests
             Page = 1,
             Count = 5
         };
-        List<User>? users = null;
+        List<MogutaUser>? users = null;
 
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -162,7 +162,7 @@ public class IntegrationUsersTests
         _logger.LogInformation("Запуск теста FindUserAsync_RealApi_ShouldReturnExistingUser для email: {Email}...", existingEmail);
 
         // Arrange
-        User? foundUser = null;
+        MogutaUser? foundUser = null;
 
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -195,7 +195,7 @@ public class IntegrationUsersTests
         // Arrange
         string nonExistingEmail = $"nonexistent-user-{Guid.NewGuid()}@example.invalid";
         _logger.LogInformation("Запуск теста FindUserAsync_RealApi_ShouldReturnNullForNotFound для email: {Email}...", nonExistingEmail);
-        User? foundUser = null;
+        MogutaUser? foundUser = null;
 
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -228,7 +228,7 @@ public class IntegrationUsersTests
         // --- Arrange: Создание пользователя ---
         var uniqueId = Guid.NewGuid().ToString("N").Substring(0, 12);
         var newUserEmail = $"delete.user.{uniqueId}@integration.test"; // Уникальный email
-        var newUser = new User
+        var newUser = new MogutaUser
         {
             Email = newUserEmail,
             Name = $"Тест Юзер Удаление {uniqueId}",
@@ -236,11 +236,11 @@ public class IntegrationUsersTests
             Activity = true,
             Blocked = false
         };
-        var usersToImport = new List<User> { newUser };
+        var usersToImport = new List<MogutaUser> { newUser };
         _logger.LogInformation("Запуск теста CreateAndDeleteUserAsync: Создание пользователя с Email: {Email}...", newUser.Email);
 
         string? importResult = null;
-        User? createdUser = null;
+        MogutaUser? createdUser = null;
 
         // --- Act 1: Создание ---
         var createException = await Record.ExceptionAsync(async () =>
@@ -263,7 +263,7 @@ public class IntegrationUsersTests
 
         // --- Arrange 2: Подготовка к удалению ---
         string? deleteResult = null;
-        User? foundAfterDelete = null;
+        MogutaUser? foundAfterDelete = null;
         var emailsToDelete = new List<string> { newUser.Email };
 
         // --- Act 2: Удаление ---

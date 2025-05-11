@@ -2,7 +2,7 @@
 using Moguta.ApiClient.Infrastructure.Converters;
 
 namespace Moguta.ApiClient.Models.Common;
-public class Variant
+public class MogutaVariant
 {
     [JsonPropertyName("id")]
     [JsonConverter(typeof(StringToLongConverter))] // Строка

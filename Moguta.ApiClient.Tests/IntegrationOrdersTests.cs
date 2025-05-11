@@ -115,7 +115,7 @@ public class IntegrationOrdersTests
             Page = 1,
             Count = 5
         };
-        List<Order>? orders = null;
+        List<MogutaOrder>? orders = null;
 
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -161,7 +161,7 @@ public class IntegrationOrdersTests
                                                  // -----------------------------------------------------------------
 
         var uniqueId = Guid.NewGuid().ToString("N").Substring(0, 8);
-        var newOrder = new Order
+        var newOrder = new MogutaOrder
         {
             // Id = null,
             UserEmail = customerEmail,
@@ -175,13 +175,13 @@ public class IntegrationOrdersTests
             UserComment = $"Интеграционный тест заказа {uniqueId}" // Комментарий все равно отправим
                                                                    // OrderItems не указываем
         };
-        var ordersToImport = new List<Order> { newOrder };
+        var ordersToImport = new List<MogutaOrder> { newOrder };
 
         _logger.LogInformation("Запуск теста CreateAndDeleteBasicOrderAsync: Создание заказа для Email: {Email}...", newOrder.UserEmail);
 
         string? importResult = null;
-        List<Order>? foundOrders = null;
-        Order? createdOrder = null;
+        List<MogutaOrder>? foundOrders = null;
+        MogutaOrder? createdOrder = null;
         long? createdOrderId = null;
 
         // --- Act 1: Создание ---
@@ -211,7 +211,7 @@ public class IntegrationOrdersTests
 
         // --- Arrange 2: Подготовка к удалению ---
         string? deleteResult = null;
-        List<Order>? foundAfterDelete = null;
+        List<MogutaOrder>? foundAfterDelete = null;
 
         // --- Act 2: Удаление ---
         _logger.LogInformation("Этап удаления в тесте CreateAndDeleteBasicOrderAsync: Удаление заказа ID={OrderId}...", createdOrderId.Value);

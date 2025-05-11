@@ -11,7 +11,7 @@ public class GetProductResponsePayload
     public long TotalCount { get; set; }
 
     [JsonPropertyName("products")] // Имя верное
-    public List<Product> Products { get; set; } = [];
+    public List<MogutaProduct> Products { get; set; } = [];
 
     [JsonPropertyName("page")]
     public int? Page { get; set; } // Стандартный парсер справится

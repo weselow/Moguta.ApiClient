@@ -4,7 +4,7 @@ using Moguta.ApiClient.Infrastructure.Converters;
 
 namespace Moguta.ApiClient.Models.Common;
 
-public class Product
+public class MogutaProduct
 {
     /// <summary>
     /// id товара
@@ -50,7 +50,10 @@ public class Product
     /// <summary>
     /// последняя секция урла
     /// </summary>
-    /// <remarks>Пример: 'raspredelitelnyy-elektroshkaf'</remarks>
+    /// <remarks>
+    /// <para>Пример: 'raspredelitelnyy-elektroshkaf'</para>
+    /// <para>Пример: 'test-prod-create-35cc1c8c2e' - слеша нет на конце.</para>
+    /// </remarks>
     [JsonPropertyName("url")]
     public string Url { get; set; } = string.Empty;
 
@@ -208,13 +211,13 @@ public class Product
     public decimal? StorageCount { get; set; }
 
     [JsonPropertyName("variants")]
-    public List<Variant>? Variants { get; set; }
+    public List<MogutaVariant>? Variants { get; set; }
 
     /// <summary>
     /// Характеристики (аттрибуты)
     /// </summary>
     [JsonPropertyName("property")]
-    public List<Property>? Property { get; set; }
+    public List<MogutaProperty>? Property { get; set; }
 
 
     // Убираем поля, которых нет в ответе: category_url, images, yml, opf_*

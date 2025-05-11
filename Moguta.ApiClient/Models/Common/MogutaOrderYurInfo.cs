@@ -6,7 +6,7 @@ namespace Moguta.ApiClient.Models.Common;
 /// Представляет информацию о юридическом лице, связанную с заказом.
 /// Основано на поле 'yur_info' в примере getOrder.
 /// </summary>
-public class OrderYurInfo
+public class MogutaOrderYurInfo
 {
     /// <summary>
     /// Получает или задает Email (вероятно, из профиля пользователя).

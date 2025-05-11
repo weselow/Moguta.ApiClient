@@ -7,7 +7,7 @@ namespace Moguta.ApiClient.Models.Common;
 /// <summary>
 /// Представляет сущность "Заказ" в MogutaCMS.
 /// </summary>
-public class Order
+public class MogutaOrder
 {
     /// <summary>
     /// Получает или задает уникальный идентификатор заказа.
@@ -62,7 +62,7 @@ public class Order
     /// Получает или задает структурированные детали адреса доставки. Рекомендуется использовать при создании новых заказов.
     /// </summary>
     [JsonPropertyName("address_parts")]
-    public OrderAddress? AddressParts { get; set; }
+    public MogutaOrderAddress? AddressParts { get; set; }
 
     /// <summary>
     /// Получает или задает общую сумму позиций заказа (без доставки) в валюте заказа.
@@ -87,7 +87,7 @@ public class Order
     /// Требует, чтобы API сервера мог обработать JSON в этом поле.
     /// </summary>
     [JsonPropertyName("order_content")]  // Игнорировать при стандартной сериализации/десериализации самого Order
-    public List<OrderItem>? OrderItems { get; set; }
+    public List<MogutaOrderItem>? OrderItems { get; set; }
 
     /// <summary>
     /// Получает или задает ID выбранного способа доставки.
@@ -146,7 +146,7 @@ public class Order
     /// Получает или задает информацию о юридическом лице, предоставленную клиентом.
     /// </summary>
     [JsonPropertyName("yur_info")]
-    public OrderYurInfo? YurInfo { get; set; }
+    public MogutaOrderYurInfo? YurInfo { get; set; }
 
     /// <summary>
     /// Получает или задает имя покупателя (может отличаться от имени в аккаунте пользователя).

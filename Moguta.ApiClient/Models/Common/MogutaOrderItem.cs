@@ -6,7 +6,7 @@ namespace Moguta.ApiClient.Models.Common;
 /// <summary>
 /// Представляет позицию (товар) внутри заказа.
 /// </summary>
-public class OrderItem
+public class MogutaOrderItem
 {
     /// <summary>
     /// Получает или задает ID товара.

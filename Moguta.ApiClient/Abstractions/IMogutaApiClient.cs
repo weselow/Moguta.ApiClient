@@ -11,19 +11,21 @@ namespace Moguta.ApiClient.Abstractions;
 /// </summary>
 public interface IMogutaApiClient
 {
+    bool AddActualOptions(MogutaApiClientOptions options);
+
     #region Методы Товаров (Product)
 
     /// <summary>
     /// Импортирует (создает или обновляет) товары в MogutaCMS.
     /// </summary>
-    /// <param name="products">Список объектов <see cref="Product"/> для импорта. Рекомендуется не более 100 за раз.</param>
+    /// <param name="products">Список объектов <see cref="MogutaProduct"/> для импорта. Рекомендуется не более 100 за раз.</param>
     /// <param name="batchSize">Количество товаров в одном запросе (max 100).</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
     /// <returns>Задача, представляющая асинхронную операцию. Содержит строку ответа API с результатом (например, "Импортировано: 1 Обновлено: 0 Ошибок: 0").</returns>
     /// <exception cref="ArgumentException">Выбрасывается, если список товаров null или пуст.</exception>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<string?> ImportProductAsync(List<Product> products, int batchSize = 100, CancellationToken cancellationToken = default);
+    Task<string?> ImportProductAsync(List<MogutaProduct> products, int batchSize = 100, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Удаляет товары из MogutaCMS по их уникальным идентификаторам.
@@ -41,10 +43,10 @@ public interface IMogutaApiClient
     /// </summary>
     /// <param name="requestParams">Параметры для фильтрации (по ID, артикулу, названию) или пагинации. Включает флаги для получения вариантов и характеристик.</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
-    /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="Product"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
+    /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="MogutaProduct"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<List<Product>?> GetProductAsync(GetProductRequestParams requestParams, CancellationToken cancellationToken = default);
+    Task<List<MogutaProduct>?> GetProductAsync(GetProductRequestParams requestParams, CancellationToken cancellationToken = default);
     #endregion
 
     #region Методы Категорий (Category)
@@ -53,21 +55,21 @@ public interface IMogutaApiClient
     /// </summary>
     /// <param name="requestParams">Параметры для фильтрации (по ID, URL) или пагинации.</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
-    /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="Category"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
+    /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="MogutaCategory"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<List<Category>?> GetCategoryAsync(GetCategoryRequestParams requestParams, CancellationToken cancellationToken = default);
+    Task<List<MogutaCategory>?> GetCategoryAsync(GetMogutaCategoryRequestParams requestParams, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Импортирует (создает или обновляет) категории в MogutaCMS.
     /// </summary>
-    /// <param name="categories">Список объектов <see cref="Category"/> для импорта. Рекомендуется не более 100 за раз.</param>
+    /// <param name="categories">Список объектов <see cref="MogutaCategory"/> для импорта. Рекомендуется не более 100 за раз.</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
     /// <returns>Задача, представляющая асинхронную операцию. Содержит строку ответа API с результатом.</returns>
     /// <exception cref="ArgumentException">Выбрасывается, если список категорий null или пуст.</exception>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<string?> ImportCategoryAsync(List<Category> categories, CancellationToken cancellationToken = default);
+    Task<string?> ImportCategoryAsync(List<MogutaCategory> categories, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Удаляет категории из MogutaCMS по их уникальным идентификаторам.
@@ -86,33 +88,33 @@ public interface IMogutaApiClient
     /// Получает заказы из MogutaCMS на основе указанных критериев.
     /// </summary>
     /// <remarks>
-    /// Поле 'OrderContent' в возвращаемых объектах <see cref="Order"/> будет содержать необработанную PHP сериализованную строку из API.
+    /// Поле 'OrderContent' в возвращаемых объектах <see cref="MogutaOrder"/> будет содержать необработанную PHP сериализованную строку из API.
     /// Автоматическая десериализация этого поля не поддерживается (кроме случаев, когда API возвращает JSON).
-    /// Используйте свойство <see cref="Order.OrderItems"/>, если контент был успешно десериализован как JSON.
+    /// Используйте свойство <see cref="MogutaOrder.OrderItems"/>, если контент был успешно десериализован как JSON.
     /// </remarks>
     /// <param name="requestParams">Параметры для фильтрации (по ID, номеру, email) или пагинации.</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
-    /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="Order"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
+    /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="MogutaOrder"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<List<Order>?> GetOrderAsync(GetOrderRequestParams requestParams, CancellationToken cancellationToken = default);
+    Task<List<MogutaOrder>?> GetOrderAsync(GetOrderRequestParams requestParams, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Импортирует (создает или обновляет) заказы в MogutaCMS.
     /// </summary>
     /// <remarks>
-    /// **Важно:** Передавайте позиции заказа через свойство <c>OrderItems</c> объекта <see cref="Order"/>.
+    /// **Важно:** Передавайте позиции заказа через свойство <c>OrderItems</c> объекта <see cref="MogutaOrder"/>.
     /// Этот список будет автоматически сериализован в JSON и отправлен в поле 'order_content'.
     /// Этот подход требует, чтобы API MogutaCMS корректно обрабатывал JSON строку в параметре 'order_content' вместо строки PHP serialize.
     /// Проверьте совместимость API перед использованием для создания/обновления позиций заказа.
     /// </remarks>
-    /// <param name="orders">Список объектов <see cref="Order"/> для импорта. Рекомендуется не более 100 за раз.</param>
+    /// <param name="orders">Список объектов <see cref="MogutaOrder"/> для импорта. Рекомендуется не более 100 за раз.</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
     /// <returns>Задача, представляющая асинхронную операцию. Содержит строку ответа API с результатом.</returns>
     /// <exception cref="ArgumentException">Выбрасывается, если список заказов null или пуст.</exception>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<string?> ImportOrderAsync(List<Order> orders, CancellationToken cancellationToken = default);
+    Task<string?> ImportOrderAsync(List<MogutaOrder> orders, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Удаляет заказы из MogutaCMS по их уникальным идентификаторам.
@@ -132,22 +134,22 @@ public interface IMogutaApiClient
     /// </summary>
     /// <param name="requestParams">Параметры для фильтрации или пагинации.</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
-    /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="User"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
+    /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="MogutaUser"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<List<User>?> GetUserAsync(GetUserRequestParams requestParams, CancellationToken cancellationToken = default);
+    Task<List<MogutaUser>?> GetUserAsync(GetUserRequestParams requestParams, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Импортирует (создает или обновляет) пользователей в MogutaCMS. Обновление обычно происходит по совпадению email.
     /// </summary>
-    /// <param name="users">Список объектов <see cref="User"/> для импорта. Рекомендуется не более 100 за раз.</param>
+    /// <param name="users">Список объектов <see cref="MogutaUser"/> для импорта. Рекомендуется не более 100 за раз.</param>
     /// <param name="enableUpdate">Установите <c>true</c> для разрешения обновления существующих пользователей (по email). Установите <c>false</c> для создания только новых. Установите <c>null</c> для использования поведения API по умолчанию (вероятно, обновление включено).</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
     /// <returns>Задача, представляющая асинхронную операцию. Содержит строку ответа API с результатом.</returns>
     /// <exception cref="ArgumentException">Выбрасывается, если список пользователей null или пуст.</exception>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<string?> ImportUserAsync(List<User> users, bool? enableUpdate = true, CancellationToken cancellationToken = default);
+    Task<string?> ImportUserAsync(List<MogutaUser> users, bool? enableUpdate = true, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Удаляет пользователей из MogutaCMS по их email адресам.
@@ -165,11 +167,11 @@ public interface IMogutaApiClient
     /// </summary>
     /// <param name="email">Email адрес пользователя для поиска.</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
-    /// <returns>Задача, представляющая асинхронную операцию. Содержит найденный объект <see cref="User"/> или <c>null</c>, если пользователь с таким email не существует.</returns>
+    /// <returns>Задача, представляющая асинхронную операцию. Содержит найденный объект <see cref="MogutaUser"/> или <c>null</c>, если пользователь с таким email не существует.</returns>
     /// <exception cref="ArgumentException">Выбрасывается, если email null или пуст.</exception>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API (кроме ошибок 'не найдено') или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<User?> FindUserAsync(string email, CancellationToken cancellationToken = default);
+    Task<MogutaUser?> FindUserAsync(string email, CancellationToken cancellationToken = default);
     #endregion
 
     #region Служебные Методы

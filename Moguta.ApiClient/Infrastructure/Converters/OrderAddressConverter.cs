@@ -10,9 +10,9 @@ namespace Moguta.ApiClient.Infrastructure.Converters;
 /// Конвертирует поле 'address_parts' из JSON.
 /// Оно может быть либо булевым 'false', либо объектом OrderAddress.
 /// </summary>
-public class OrderAddressConverter : JsonConverter<OrderAddress?>
+public class OrderAddressConverter : JsonConverter<MogutaOrderAddress?>
 {
-    public override OrderAddress? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override MogutaOrderAddress? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         // Проверяем тип токена
         if (reader.TokenType == JsonTokenType.False)
@@ -28,7 +28,7 @@ public class OrderAddressConverter : JsonConverter<OrderAddress?>
             var optionsWithoutThis = new JsonSerializerOptions(options);
             optionsWithoutThis.Converters.Remove(this); // Удаляем себя из копии опций
 
-            return JsonSerializer.Deserialize<OrderAddress>(ref reader, optionsWithoutThis);
+            return JsonSerializer.Deserialize<MogutaOrderAddress>(ref reader, optionsWithoutThis);
         }
 
         if (reader.TokenType == JsonTokenType.Null)
@@ -40,7 +40,7 @@ public class OrderAddressConverter : JsonConverter<OrderAddress?>
         throw new JsonException($"Неожиданный тип токена {reader.TokenType} для поля address_parts. Ожидался объект или false.");
     }
 
-    public override void Write(Utf8JsonWriter writer, OrderAddress? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, MogutaOrderAddress? value, JsonSerializerOptions options)
     {
         // При записи мы всегда будем записывать либо объект, либо null
         if (value == null)

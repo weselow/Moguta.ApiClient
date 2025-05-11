@@ -7,7 +7,7 @@ namespace Moguta.ApiClient.Models.Common;
 /// Представляет сущность "Категория" в MogutaCMS.
 /// Основано на документации и примерах импорта/экспорта.
 /// </summary>
-public class Category
+public class MogutaCategory
 {
     /// <summary>
     /// Получает или задает уникальный идентификатор категории.
@@ -37,7 +37,9 @@ public class Category
 
     /// <summary>
     /// Получает полный путь URL родительских категорий (только для чтения, предоставляется API при GET-запросе).
-    /// Пример: "catalog/electronics"
+    /// Пример: "catalog/electronics/"
+    /// Пример: "test-category/"
+    /// Пример: "test-category/test-subcategory/"
     /// </summary>
     [JsonPropertyName("parent_url")]
     public string? ParentUrl { get; set; } // Только чтение

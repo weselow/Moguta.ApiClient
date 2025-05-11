@@ -1,8 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using Moguta.ApiClient.Infrastructure.Converters;
-using Moguta.ApiClient.Models.Common;
 
-public class Property
+namespace Moguta.ApiClient.Models.Common;
+
+public class MogutaProperty
 {
     // Поля из ответа API getProduct
     [JsonPropertyName("id")]
@@ -24,8 +25,8 @@ public class Property
     /// Список значений этой характеристики
     /// </summary>
     [JsonPropertyName("data")]
-    [JsonConverter(typeof(NullableListConverter<PropertyData>))] 
-    public List<PropertyData>? Data { get; set; } 
+    [JsonConverter(typeof(NullableListConverter<MogutaPropertyData>))] 
+    public List<MogutaPropertyData>? Data { get; set; } 
 
 
     [JsonPropertyName("all_category")] // Непонятно, bool или int

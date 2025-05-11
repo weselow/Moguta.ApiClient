@@ -3,7 +3,7 @@ using Moguta.ApiClient.Infrastructure.Converters;
 
 namespace Moguta.ApiClient.Models.Common;
 
-public class PropertyData
+public class MogutaPropertyData
 {
     [JsonPropertyName("id")]
     [JsonConverter(typeof(StringToLongConverter))]

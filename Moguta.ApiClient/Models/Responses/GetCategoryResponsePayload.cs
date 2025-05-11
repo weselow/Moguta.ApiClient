@@ -20,7 +20,7 @@ public class GetCategoryResponsePayload
     /// Получает список категорий для текущей страницы.
     /// </summary>
     [JsonPropertyName("categories")]
-    public List<Category> Categories { get; set; } = [];
+    public List<MogutaCategory> Categories { get; set; } = [];
 
     /// <summary>
     /// Получает номер текущей страницы (только при пагинации).

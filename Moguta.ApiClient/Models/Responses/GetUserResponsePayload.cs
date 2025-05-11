@@ -20,7 +20,7 @@ public class GetUserResponsePayload
     /// Получает список пользователей для текущей страницы.
     /// </summary>
     [JsonPropertyName("users")]
-    public List<User> Users { get; set; } = [];
+    public List<MogutaUser> Users { get; set; } = [];
 
     /// <summary>
     /// Получает номер текущей страницы (только при пагинации).

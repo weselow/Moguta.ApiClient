@@ -114,11 +114,10 @@ public class IntegrationProductsTests
         {
             Page = 1,
             Count = 10,
-            Codes = ["RES-TEST-875d682d"],
             IncludeVariants = true,
             IncludeProperties = true
         };
-        List<Product>? products = null;
+        List<MogutaProduct>? products = null;
 
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -167,7 +166,7 @@ public class IntegrationProductsTests
         // !!! ЗАМЕНИТЬ НА РЕАЛЬНЫЙ ID КАТЕГОРИИ !!!
         long categoryId = 1;
         // -----------------------------------------
-        var initialProduct = new Product
+        var initialProduct = new MogutaProduct
         {
             CatId = categoryId,
             Title = initialTitle,
@@ -184,7 +183,7 @@ public class IntegrationProductsTests
         // --- Act 1: Создание ---
         var createException = await Record.ExceptionAsync(async () =>
         {
-            var importResult = await _apiClient!.ImportProductAsync(new List<Product> { initialProduct });
+            var importResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { initialProduct });
             Assert.NotNull(importResult);
             Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
             await Task.Delay(500);
@@ -199,7 +198,7 @@ public class IntegrationProductsTests
         _logger.LogInformation("Этап создания в тесте CreateUpdateDeleteProduct: Товар создан, ID={ProdId}", createdProductId);
 
         // --- Arrange 2: Подготовка к обновлению ---
-        var productToUpdate = new Product
+        var productToUpdate = new MogutaProduct
         {
             Id = createdProductId.Value, // Указываем ID
             CatId = categoryId,          // Категорию обычно надо указывать
@@ -214,10 +213,10 @@ public class IntegrationProductsTests
 
         // --- Act 2: Обновление ---
         string? updateResult = null;
-        Product? updatedProduct = null;
+        MogutaProduct? updatedProduct = null;
         var updateException = await Record.ExceptionAsync(async () =>
         {
-            updateResult = await _apiClient!.ImportProductAsync(new List<Product> { productToUpdate });
+            updateResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { productToUpdate });
             await Task.Delay(500);
             var searchParams = new GetProductRequestParams { Ids = new List<long> { createdProductId.Value }, IncludeVariants = false, IncludeProperties = false }; // Ищем по ID
             updatedProduct = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault();
@@ -235,7 +234,7 @@ public class IntegrationProductsTests
 
         // --- Arrange 3: Подготовка к удалению ---
         string? deleteResult = null;
-        List<Product>? foundAfterDelete = null;
+        List<MogutaProduct>? foundAfterDelete = null;
 
         // --- Act 3: Удаление ---
         _logger.LogInformation("Этап удаления в тесте CreateUpdateDeleteProduct: Удаление товара ID={ProdId}...", createdProductId.Value);
@@ -279,11 +278,11 @@ public class IntegrationProductsTests
         long categoryId = 5; // Пример! Укажите ID существующей категории.
 
         var newProduct = CreateTestProduct(categoryId);
-        var productsToImport = new List<Product> { newProduct };
+        var productsToImport = new List<MogutaProduct> { newProduct };
         _logger.LogInformation("Запуск теста CreateAndDeleteRealisticProduct: Создание товара Code: {Code}...", newProduct.Code);
 
         string? importResult = null;
-        Product? createdProduct = null;
+        MogutaProduct? createdProduct = null;
         long? createdProductId = null;
 
         // --- Act 1: Создание ---
@@ -340,7 +339,7 @@ public class IntegrationProductsTests
         // --- Arrange 2 + Act 2 + Assert 2: Удаление ---
         _logger.LogInformation("Этап удаления в тесте CreateAndDeleteRealisticProduct: Удаление товара ID={ProdId}...", createdProductId.Value);
         string? deleteResult = null;
-        List<Product>? foundAfterDelete = null;
+        List<MogutaProduct>? foundAfterDelete = null;
         var deleteException = await Record.ExceptionAsync(async () =>
         {
             deleteResult = await _apiClient!.DeleteProductAsync(new List<long> { createdProductId.Value });
@@ -378,7 +377,7 @@ public class IntegrationProductsTests
 
         // --- Подготовка ---
         long categoryId = 1; // Пример ID категории
-        var allProducts = new List<Product>();
+        var allProducts = new List<MogutaProduct>();
         for (int i = 0; i < totalProductsToCreate; i++)
         {
             allProducts.Add(CreateTestProduct(categoryId));
@@ -466,7 +465,7 @@ public class IntegrationProductsTests
         var initialCode = $"TEST-CODE-{uniqueId}";
         long categoryId = 1; // Пример ID категории
 
-        var productToCreate = new Product
+        var productToCreate = new MogutaProduct
         {
             CatId = categoryId,
             Title = initialTitle,
@@ -481,7 +480,7 @@ public class IntegrationProductsTests
 
         var createException = await Record.ExceptionAsync(async () =>
         {
-            var importResult = await _apiClient!.ImportProductAsync(new List<Product> { productToCreate });
+            var importResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { productToCreate });
             Assert.NotNull(importResult);
             Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
 
@@ -495,7 +494,7 @@ public class IntegrationProductsTests
         _logger.LogInformation("Товар создан, ID={ProdId}", createdProductId);
 
         // --- Act: Обновление с использованием ID и Code ---
-        var productToUpdate = new Product
+        var productToUpdate = new MogutaProduct
         {
             Id = createdProductId.Value,
             CatId = categoryId,
@@ -506,10 +505,10 @@ public class IntegrationProductsTests
             Activity = true
         };
 
-        Product? updatedProduct = null;
+        MogutaProduct? updatedProduct = null;
         var updateException = await Record.ExceptionAsync(async () =>
         {
-            var updateResult = await _apiClient!.ImportProductAsync(new List<Product> { productToUpdate });
+            var updateResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { productToUpdate });
             Assert.NotNull(updateResult);
             Assert.Contains("импорт", updateResult, StringComparison.OrdinalIgnoreCase);
 
@@ -558,7 +557,7 @@ public class IntegrationProductsTests
         var initialCode = $"TEST-CODE-{uniqueId}";
         long categoryId = 1; // Пример ID категории
 
-        var productToCreate = new Product
+        var productToCreate = new MogutaProduct
         {
             CatId = categoryId,
             Title = initialTitle,
@@ -573,7 +572,7 @@ public class IntegrationProductsTests
 
         var createException = await Record.ExceptionAsync(async () =>
         {
-            var importResult = await _apiClient!.ImportProductAsync(new List<Product> { productToCreate });
+            var importResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { productToCreate });
             Assert.NotNull(importResult);
             Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
 
@@ -587,7 +586,7 @@ public class IntegrationProductsTests
         _logger.LogInformation("Товар создан, ID={ProdId}", createdProductId);
 
         // --- Act: Обновление с использованием только Code ---
-        var productToUpdate = new Product
+        var productToUpdate = new MogutaProduct
         {
             CatId = categoryId,
             Title = updatedTitle,
@@ -597,10 +596,10 @@ public class IntegrationProductsTests
             Activity = true
         };
 
-        Product? updatedProduct = null;
+        MogutaProduct? updatedProduct = null;
         var updateException = await Record.ExceptionAsync(async () =>
         {
-            var updateResult = await _apiClient!.ImportProductAsync(new List<Product> { productToUpdate });
+            var updateResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { productToUpdate });
             Assert.NotNull(updateResult);
             Assert.Contains("импорт", updateResult, StringComparison.OrdinalIgnoreCase);
 
@@ -650,7 +649,7 @@ public class IntegrationProductsTests
         var initialCode = $"TEST-CODE-{uniqueId}";
         long categoryId = 1; // Пример ID категории
 
-        var productToCreate = new Product
+        var productToCreate = new MogutaProduct
         {
             CatId = categoryId,
             Title = initialTitle,
@@ -667,7 +666,7 @@ public class IntegrationProductsTests
 
         var createException = await Record.ExceptionAsync(async () =>
         {
-            var importResult = await _apiClient!.ImportProductAsync(new List<Product> { productToCreate });
+            var importResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { productToCreate });
             Assert.NotNull(importResult);
             Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
 
@@ -681,7 +680,7 @@ public class IntegrationProductsTests
         _logger.LogInformation("Товар создан, ID={ProdId}", createdProductId);
 
         // --- Act: Обновление с null для Description и ShortDescription ---
-        var productToUpdate = new Product
+        var productToUpdate = new MogutaProduct
         {
             Id = createdProductId.Value,
             CatId = categoryId,
@@ -694,10 +693,10 @@ public class IntegrationProductsTests
             Activity = true
         };
 
-        Product? updatedProduct = null;
+        MogutaProduct? updatedProduct = null;
         var updateException = await Record.ExceptionAsync(async () =>
         {
-            var updateResult = await _apiClient!.ImportProductAsync(new List<Product> { productToUpdate });
+            var updateResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { productToUpdate });
             Assert.NotNull(updateResult);
             Assert.Contains("импорт", updateResult, StringComparison.OrdinalIgnoreCase);
 
@@ -770,11 +769,11 @@ public class IntegrationProductsTests
 
 
     #region Вспомогательные методы
-    private Product CreateTestProduct(long categoryId)
+    private MogutaProduct CreateTestProduct(long categoryId)
     {
         var uniqueId = Guid.NewGuid().ToString("N").Substring(0, 8);
 
-        var newProduct = new Product
+        var newProduct = new MogutaProduct
         {
             // Основные данные
             CatId = categoryId,
@@ -818,22 +817,22 @@ public class IntegrationProductsTests
             // Важно: Имена характеристик ("Сопротивление", "Мощность", "Точность", "Типоразмер", "Производитель")
             // должны либо УЖЕ СУЩЕСТВОВАТЬ в Moguta, либо будут созданы с типом "string" или "textarea".
             // Если характеристика существует, тип и другие её параметры будут взяты из существующей.
-            Property = new List<Property>
+            Property = new List<MogutaProperty>
             {
-                new Property { Name = "Сопротивление", Value = "10 кОм", Type = "string"}, // Если хар-ка есть, тип можно не указывать
-                new Property { Name = "Мощность", Value = "0.25 Вт", Type = "string"},
-                new Property { Name = "Accuracy (%)", Value = "5", Type = "string"}, // Число как строка
-                new Property { Name = "SizeType", Value = "0805", Type = "string"},
-                new Property { Name = "Manufacturer-1", Value = $"TestCorp-{uniqueId}", Type = "string"},
-                new Property { Name = "Комментарий", Value = $"Создано тестом {DateTime.Now}", Type = "textarea"}
+                new MogutaProperty { Name = "Сопротивление", Value = "10 кОм", Type = "string"}, // Если хар-ка есть, тип можно не указывать
+                new MogutaProperty { Name = "Мощность", Value = "0.25 Вт", Type = "string"},
+                new MogutaProperty { Name = "Accuracy (%)", Value = "5", Type = "string"}, // Число как строка
+                new MogutaProperty { Name = "SizeType", Value = "0805", Type = "string"},
+                new MogutaProperty { Name = "Manufacturer-1", Value = $"TestCorp-{uniqueId}", Type = "string"},
+                new MogutaProperty { Name = "Комментарий", Value = $"Создано тестом {DateTime.Now}", Type = "textarea"}
             },
 
             // Варианты (Variants)
             // Артикулы вариантов должны быть уникальны!
             // Цены, кол-во и вес вариантов могут переопределять базовые значения товара.
-            Variants = new List<Variant>
+            Variants = new List<MogutaVariant>
             {
-                new Variant {
+                new MogutaVariant {
                     TitleVariant = "-Var1", // Добавка к основному названию
                     Code = $"RES-TEST-{uniqueId}", // Уникальный артикул варианта
                     Price = 5.75m, // Другая цена
@@ -842,7 +841,7 @@ public class IntegrationProductsTests
                     Weight = 0.002m
                 },
                 // Вариант с точностью 1%
-                new Variant {
+                new MogutaVariant {
                     TitleVariant = "-Var2", // Добавка к основному названию
                     Code = $"RES-TEST-{uniqueId}-2", // Уникальный артикул варианта
                     Price = 7, // Другая цена
@@ -852,7 +851,7 @@ public class IntegrationProductsTests
                     Weight = 3, // Чуть другой вес
                 },
                  // Вариант с другой мощностью (если это возможно как вариант, а не отдельный товар)
-                 new Variant {
+                 new MogutaVariant {
                     TitleVariant = "-Var3",
                     Code = $"RES-TEST-{uniqueId}-3",
                     Price = 8.20m,
@@ -861,7 +860,7 @@ public class IntegrationProductsTests
                     Weight = 0.003m,
                 },
                  // Неактивный вариант
-                 new Variant {
+                 new MogutaVariant {
                     TitleVariant = "Снято с производства",
                     Code = $"RES-TEST-{uniqueId}-4",
                     Price = 4.00m,

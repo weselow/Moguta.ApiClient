@@ -45,23 +45,7 @@ public partial class MogutaApiClient : IMogutaApiClient
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options)); // Получаем значение из IOptions
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        // Простая валидация опций при создании клиента
-        if (string.IsNullOrWhiteSpace(_options.SiteUrl) || !Uri.TryCreate(_options.SiteUrl, UriKind.Absolute, out _))
-            throw new ArgumentException("SiteUrl обязателен и должен быть валидным абсолютным URL.", $"{nameof(options)}.{nameof(_options.SiteUrl)}");
-        if (string.IsNullOrWhiteSpace(_options.Token))
-            throw new ArgumentException("Token обязателен.", $"{nameof(options)}.{nameof(_options.Token)}");
-        if (string.IsNullOrWhiteSpace(_options.SecretKey))
-            throw new ArgumentException("SecretKey обязателен.", $"{nameof(options)}.{nameof(_options.SecretKey)}");
-
-        // Конфигурация HttpClient
-        try
-        {
-            _httpClient.BaseAddress = new Uri(_options.SiteUrl.TrimEnd('/') + ApiPath + "/"); // Убеждаемся в наличии слеша в конце
-        }
-        catch (UriFormatException ex)
-        {
-            throw new ArgumentException($"Неверный формат SiteUrl: '{_options.SiteUrl}'. Ошибка: {ex.Message}", $"{nameof(options)}.{nameof(_options.SiteUrl)}", ex);
-        }
+        AddActualOptions(options.Value);
 
         _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -76,6 +60,33 @@ public partial class MogutaApiClient : IMogutaApiClient
 
         _logger.LogInformation("MogutaApiClient инициализирован. BaseAddress: {BaseAddress}, ValidateSignature: {ValidateSignature}", _httpClient.BaseAddress, _options.ValidateApiResponseSignature);
     }
+
+    public bool AddActualOptions(MogutaApiClientOptions options)
+    {
+        // Простая валидация опций при создании клиента
+        if (string.IsNullOrWhiteSpace(options.SiteUrl) || !Uri.TryCreate(options.SiteUrl, UriKind.Absolute, out _))
+            throw new ArgumentException("SiteUrl обязателен и должен быть валидным абсолютным URL.", $"{nameof(options)}.{nameof(options.SiteUrl)}");
+        if (string.IsNullOrWhiteSpace(options.Token))
+            throw new ArgumentException("Token обязателен.", $"{nameof(options)}.{nameof(options.Token)}");
+        if (string.IsNullOrWhiteSpace(options.SecretKey))
+            throw new ArgumentException("SecretKey обязателен.", $"{nameof(options)}.{nameof(options.SecretKey)}");
+
+        // Конфигурация HttpClient
+        try
+        {
+            _httpClient.BaseAddress = new Uri(options.SiteUrl.TrimEnd('/') + ApiPath + "/"); // Убеждаемся в наличии слеша в конце
+        }
+        catch (UriFormatException ex)
+        {
+            throw new ArgumentException($"Неверный формат SiteUrl: '{options.SiteUrl}'. Ошибка: {ex.Message}", $"{nameof(options)}.{nameof(options.SiteUrl)}", ex);
+        }
+
+        //Обновляем остальные опции
+        _options.UpdateFrom(options);
+
+        return true;
+    }
+
 
     // --- Приватный Вспомогательный Метод для Отправки Запросов ---
 
@@ -290,7 +301,7 @@ public partial class MogutaApiClient : IMogutaApiClient
     #region Методы Товаров (Product)
 
     /// <inheritdoc />
-    public async Task<string?> ImportProductAsync(List<Product> products, int batchSize = 100, CancellationToken cancellationToken = default)
+    public async Task<string?> ImportProductAsync(List<MogutaProduct> products, int batchSize = 100, CancellationToken cancellationToken = default)
     {
         if (products == null || products.Count == 0)
             throw new ArgumentException("Импорт товаров:  список товаров не может быть null или пустым.", nameof(products));
@@ -309,7 +320,6 @@ public partial class MogutaApiClient : IMogutaApiClient
         }
 
         var result = string.Empty;
-        var totalImported = 0;
         var uniqueData = DataHelper.FilterAndGroupToUniqueLists(products, p => p.Code);
         if (uniqueData.Count > 0)
         {
@@ -324,8 +334,7 @@ public partial class MogutaApiClient : IMogutaApiClient
                 var parameters = new ImportProductRequestParams { Products = batch };
                 var response = await SendApiRequestAsync(typeof(string), "importProduct", parameters, cancellationToken).ConfigureAwait(false);
                 result = response as string;
-                totalImported += batch.Count;
-                _logger.LogInformation("Импорт товаров: импортировано {ProductCount} товаров / всего импортировано {total}.", batch.Count, totalImported);
+                _logger.LogInformation("Импорт товаров: импортировано {ProductCount} товаров / всего {total}.", batch.Count, products.Count);
             }
         }
 
@@ -339,20 +348,26 @@ public partial class MogutaApiClient : IMogutaApiClient
         if (productIds == null || productIds.Count == 0)
             throw new ArgumentException("Список ID товаров не может быть null или пустым.", nameof(productIds));
 
-        _logger.LogInformation("Попытка удаления {ProductCount} товаров с ID: {ProductIds}", productIds.Count, string.Join(",", productIds));
-        var parameters = new DeleteProductRequestParams { ProductIds = productIds };
-        var response = await SendApiRequestAsync(typeof(string), "deleteProduct", parameters, cancellationToken).ConfigureAwait(false);
-        var result = response as string;
+        var result = string.Empty;
+        foreach (var batch in DataHelper.SplitIntoBatches(productIds, 100))
+        {
+            var parameters = new DeleteProductRequestParams { ProductIds = batch };
+            var response = await SendApiRequestAsync(typeof(string), "deleteProduct", parameters, cancellationToken)
+                .ConfigureAwait(false);
+            result = response as string;
+            _logger.LogInformation("Удаление товаров: удалено {ProductCount} товаров / всего {total}.", batch.Count, productIds.Count);
+        }
         _logger.LogInformation("Результат удаления товаров: {Result}", result);
         return result;
     }
 
     /// <inheritdoc />
-    public async Task<List<Product>?> GetProductAsync(GetProductRequestParams requestParams, CancellationToken cancellationToken = default)
+    public async Task<List<MogutaProduct>?> GetProductAsync(GetProductRequestParams requestParams, CancellationToken cancellationToken = default)
     {
-        if (requestParams.Count > _options.MaxGetProductPerPageCount) requestParams.Count = _options.MaxGetProductPerPageCount;
+        if (requestParams.Count != null
+            && requestParams.Count > _options.MaxGetProductPerPageCount) requestParams.Count = _options.MaxGetProductPerPageCount;
         _logger.LogInformation("Попытка получения товаров с параметрами: {@RequestParams}", requestParams);
-        var products = new List<Product>(); // <-- Возвращаем пустой список
+        var products = new List<MogutaProduct>(); // <-- Возвращаем пустой список
 
         while (true)
         {
@@ -362,8 +377,8 @@ public partial class MogutaApiClient : IMogutaApiClient
             products.AddRange(payload.Products);
 
             //если в ответе меньше товаров, чем запрашивали - то это последняя страница
-            if ((requestParams.Count != null && payload.Products.Count < requestParams.Count) ||
-                payload.Products.Count < _options.MaxGetProductPerPageCount) break;
+            if ((requestParams.Count != null && payload.Products.Count < requestParams.Count)
+                || payload.Products.Count < _options.MaxGetProductPerPageCount) break;
             requestParams.Page++;
         }
 
@@ -375,33 +390,64 @@ public partial class MogutaApiClient : IMogutaApiClient
 
     #region Методы Категорий (Category)
     /// <inheritdoc />
-    public async Task<List<Category>?> GetCategoryAsync(GetCategoryRequestParams requestParams, CancellationToken cancellationToken = default)
+    public async Task<List<MogutaCategory>?> GetCategoryAsync(GetMogutaCategoryRequestParams requestParams, CancellationToken cancellationToken = default)
     {
-        if (requestParams.Count > _options.MaxGetCategoryPerPageCount) requestParams.Count = _options.MaxGetCategoryPerPageCount;
+        if (requestParams.Count != null 
+            && requestParams.Count > _options.MaxGetCategoryPerPageCount) requestParams.Count = _options.MaxGetCategoryPerPageCount;
+
         _logger.LogInformation("Попытка получения категорий с параметрами: {@RequestParams}", requestParams);
-        var response = await SendApiRequestAsync(typeof(GetCategoryResponsePayload), "getCategory", requestParams, cancellationToken).ConfigureAwait(false);
-        var payload = response as GetCategoryResponsePayload;
+        var categories = new List<MogutaCategory>();
 
-        // Если payload == null (т.к. SendApiRequestAsync вернул null из-за строки "не найдено" или реального null/undefined),
-        // то возвращаем ПУСТОЙ СПИСОК, а не null, т.к. метод ожидает список.
-        var categories = payload?.Categories ?? new List<Category>(); // <-- ИЗМЕНЕНИЕ: Возвращаем пустой список, если payload null
+        while (true)
+        {
+            var response = await SendApiRequestAsync(typeof(GetCategoryResponsePayload), "getCategory", requestParams, cancellationToken).ConfigureAwait(false);
+            var payload = response as GetCategoryResponsePayload;
+            if (payload == null) break;
+            categories.AddRange(payload.Categories);
 
-        _logger.LogInformation("Успешно получено {CategoryCount} категорий (TotalCount={TotalCount}).", categories.Count, payload?.TotalCount ?? 0);
+            //если в ответе меньше товаров, чем запрашивали - то это последняя страница
+            if ((requestParams.Count != null && payload.Categories.Count < requestParams.Count)
+                || payload.Categories.Count < _options.MaxGetCategoryPerPageCount) break;
+            requestParams.Page++;
+        }
+
+        _logger.LogInformation("Успешно получено {CategoryCount} категорий.", categories.Count);
         return categories;
     }
 
     /// <inheritdoc />
-    public async Task<string?> ImportCategoryAsync(List<Category> categories, CancellationToken cancellationToken = default)
+    public async Task<string?> ImportCategoryAsync(List<MogutaCategory> categories, CancellationToken cancellationToken = default)
     {
         if (categories == null || categories.Count == 0)
-            throw new ArgumentException("Список категорий не может быть null или пустым.", nameof(categories));
-        if (categories.Count > 100)
-            _logger.LogWarning("Импорт категорий: количество {CategoryCount} превышает рекомендуемый лимит в 100.", categories.Count);
+            throw new ArgumentException("Импорт категорий: список категорий не может быть null или пустым.", nameof(categories));
 
-        _logger.LogInformation("Попытка импорта {CategoryCount} категорий.", categories.Count);
-        var parameters = new ImportCategoryRequestParams { Categories = categories };
-        var response = await SendApiRequestAsync(typeof(string), "importCategory", parameters, cancellationToken).ConfigureAwait(false);
-        var result = response as string;
+        if (categories.Any(t => string.IsNullOrEmpty(t.Url)))
+        {
+            var categoriesNames = categories.Where(t => string.IsNullOrEmpty(t.Url)).Select(t => t.Title).ToList();
+            throw new ArgumentException($"Список товаров содержит {categoriesNames.Count} товаров с пустым Url. Названия категорий: {string.Join(" | ", categoriesNames)}.", nameof(categories));
+        }
+
+        // Ограничиваем размер пакета
+        var batchSize = _options.MaxImportCategoryBatchSize;
+        var result = string.Empty;
+        var uniqueData = DataHelper.FilterAndGroupToUniqueLists(categories, p => p.Url);
+        if (uniqueData.Count > 0)
+        {
+            _logger.LogWarning("Импорт категорий: найдено {amount} дубликтов, они будут обновлены в процессе импорта.", uniqueData.Count);
+        }
+        
+        foreach (var cycle in uniqueData.Keys)
+        {
+            foreach (var batch in DataHelper.SplitIntoBatches(uniqueData[cycle], batchSize))
+            {
+                _logger.LogInformation("Импорт категорий: попытка импорта {CategoryCount} категорий.", batch.Count);
+                var parameters = new ImportCategoryRequestParams { Categories = batch };
+                var response = await SendApiRequestAsync(typeof(string), "importCategory", parameters, cancellationToken).ConfigureAwait(false);
+                result = response as string;
+                _logger.LogInformation("Импорт категорий: импортировано {ProductCount} категорий / всего {total}.", batch.Count, categories.Count);
+            }
+        }
+
         _logger.LogInformation("Результат импорта категорий: {Result}", result);
         return result;
     }
@@ -413,23 +459,31 @@ public partial class MogutaApiClient : IMogutaApiClient
             throw new ArgumentException("Список ID категорий не может быть null или пустым.", nameof(categoryIds));
 
         _logger.LogInformation("Попытка удаления {CategoryCount} категорий с ID: {CategoryIds}", categoryIds.Count, string.Join(",", categoryIds));
-        var parameters = new DeleteCategoryRequestParams { CategoryIds = categoryIds };
-        var response = await SendApiRequestAsync(typeof(string), "deleteCategory", parameters, cancellationToken).ConfigureAwait(false);
-        var result = response as string;
+
+        var result = string.Empty;
+        foreach (var batch in DataHelper.SplitIntoBatches(categoryIds, 100))
+        {
+            var parameters = new DeleteCategoryRequestParams { CategoryIds = batch };
+            var response = await SendApiRequestAsync(typeof(string), "deleteCategory", parameters, cancellationToken).ConfigureAwait(false);
+            result = response as string;
+            _logger.LogInformation("Удаление категорий: удалено {ProductCount} категорий / всего {total}.", batch.Count, categoryIds);
+        }
         _logger.LogInformation("Результат удаления категорий: {Result}", result);
         return result;
     }
+
     #endregion
 
     #region Методы Заказов (Order)
     /// <inheritdoc />
-    public async Task<List<Order>?> GetOrderAsync(GetOrderRequestParams requestParams, CancellationToken cancellationToken = default)
+    public async Task<List<MogutaOrder>?> GetOrderAsync(GetOrderRequestParams requestParams, CancellationToken cancellationToken = default)
     {
-        if (requestParams.Count > _options.MaxGetOrderPerPageCount) requestParams.Count = _options.MaxGetOrderPerPageCount;
+        if (requestParams.Count != null
+            && requestParams.Count > _options.MaxGetOrderPerPageCount) requestParams.Count = _options.MaxGetOrderPerPageCount;
         _logger.LogInformation("Попытка получения заказов с параметрами: {@RequestParams}", requestParams);
         var response = await SendApiRequestAsync(typeof(GetOrderResponsePayload), "getOrder", requestParams, cancellationToken).ConfigureAwait(false);
         var payload = response as GetOrderResponsePayload;
-        var orders = payload?.Orders ?? new List<Order>(); // <-- Возвращаем пустой список
+        var orders = payload?.Orders ?? new List<MogutaOrder>(); // <-- Возвращаем пустой список
 
         // Постобработка OrderContent остается
         if (orders.Count > 0)
@@ -463,7 +517,7 @@ public partial class MogutaApiClient : IMogutaApiClient
     }
 
     /// <inheritdoc />
-    public async Task<string?> ImportOrderAsync(List<Order> orders, CancellationToken cancellationToken = default)
+    public async Task<string?> ImportOrderAsync(List<MogutaOrder> orders, CancellationToken cancellationToken = default)
     {
         if (orders == null || orders.Count == 0)
             throw new ArgumentException("Список заказов не может быть null или пустым.", nameof(orders));
@@ -526,19 +580,20 @@ public partial class MogutaApiClient : IMogutaApiClient
 
     #region Методы Пользователей (User)
     /// <inheritdoc />
-    public async Task<List<User>?> GetUserAsync(GetUserRequestParams requestParams, CancellationToken cancellationToken = default)
+    public async Task<List<MogutaUser>?> GetUserAsync(GetUserRequestParams requestParams, CancellationToken cancellationToken = default)
     {
-        if (requestParams.Count > _options.MaxGetUsersPerPageCount) requestParams.Count = _options.MaxGetUsersPerPageCount;
+        if (requestParams.Count != null
+            && requestParams.Count > _options.MaxGetUsersPerPageCount) requestParams.Count = _options.MaxGetUsersPerPageCount;
         _logger.LogInformation("Попытка получения пользователей с параметрами: {@RequestParams}", requestParams);
         var response = await SendApiRequestAsync(typeof(GetUserResponsePayload), "getUsers", requestParams, cancellationToken).ConfigureAwait(false);
         var payload = response as GetUserResponsePayload;
-        var users = payload?.Users ?? new List<User>(); // <-- Возвращаем пустой список
+        var users = payload?.Users ?? new List<MogutaUser>(); // <-- Возвращаем пустой список
         _logger.LogInformation("Успешно получено {UserCount} пользователей (TotalCount={TotalCount}).", users.Count, payload?.TotalCount ?? 0);
         return users;
     }
 
     /// <inheritdoc />
-    public async Task<string?> ImportUserAsync(List<User> users, bool? enableUpdate = true, CancellationToken cancellationToken = default)
+    public async Task<string?> ImportUserAsync(List<MogutaUser> users, bool? enableUpdate = true, CancellationToken cancellationToken = default)
     {
         if (users == null || users.Count == 0)
             throw new ArgumentException("Список пользователей не может быть null или пустым.", nameof(users));
@@ -572,11 +627,11 @@ public partial class MogutaApiClient : IMogutaApiClient
     /// </summary>
     /// <param name="email">Email адрес пользователя для поиска.</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
-    /// <returns>Задача, представляющая асинхронную операцию. Содержит найденный объект <see cref="User"/> или <c>null</c>, если пользователь с таким email не существует.</returns>
+    /// <returns>Задача, представляющая асинхронную операцию. Содержит найденный объект <see cref="MogutaUser"/> или <c>null</c>, если пользователь с таким email не существует.</returns>
     /// <exception cref="ArgumentException">Выбрасывается, если email null или пуст.</exception>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API (кроме случая, когда API возвращает строку "не найден") или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    public async Task<User?> FindUserAsync(string email, CancellationToken cancellationToken = default)
+    public async Task<MogutaUser?> FindUserAsync(string email, CancellationToken cancellationToken = default)
     {
         // Проверка входного параметра
         if (string.IsNullOrWhiteSpace(email))
@@ -591,8 +646,8 @@ public partial class MogutaApiClient : IMogutaApiClient
             // SendApiRequestAsync вернет User?, если API вернет объект User или null в поле response.
             // SendApiRequestAsync выбросит MogutaApiException с InnerException = JsonException,
             // если API вернет status:OK, но response будет строкой (например, "не найден") или другим не-User объектом.
-            var response = await SendApiRequestAsync(typeof(User), "findUser", parameters, cancellationToken).ConfigureAwait(false);
-            var user = response as User; // Безопасное приведение к User?
+            var response = await SendApiRequestAsync(typeof(MogutaUser), "findUser", parameters, cancellationToken).ConfigureAwait(false);
+            var user = response as MogutaUser; // Безопасное приведение к User?
 
             if (user != null)
             {

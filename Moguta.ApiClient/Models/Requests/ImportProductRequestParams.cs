@@ -13,7 +13,7 @@ public class ImportProductRequestParams
     /// Рекомендуемый размер пакета - до 100 записей.
     /// </summary>
     [JsonPropertyName("products")]
-    public List<Product> Products { get; set; } = [];
+    public List<MogutaProduct> Products { get; set; } = [];
 
     // Флаг 'enableUpdate' для товаров не документирован явно в примерах API,
     // но аналогичный флаг есть для пользователей.

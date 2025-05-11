@@ -13,7 +13,7 @@ public class ImportUserRequestParams
     /// Рекомендуемый размер пакета - до 100 записей.
     /// </summary>
     [JsonPropertyName("users")]
-    public List<User> Users { get; set; } = [];
+    public List<MogutaUser> Users { get; set; } = [];
 
     /// <summary>
     /// Получает или задает значение, указывающее, следует ли обновлять существующих пользователей при совпадении (по email).

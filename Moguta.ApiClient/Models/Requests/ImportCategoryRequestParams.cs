@@ -13,7 +13,7 @@ public class ImportCategoryRequestParams
     /// Рекомендуемый размер пакета - до 100 записей.
     /// </summary>
     [JsonPropertyName("categories")]
-    public List<Category> Categories { get; set; } = [];
+    public List<MogutaCategory> Categories { get; set; } = [];
 
     // Флаг 'enableUpdate' не показан в примерах для категорий,
     // обновление, вероятно, происходит неявно при наличии ID.

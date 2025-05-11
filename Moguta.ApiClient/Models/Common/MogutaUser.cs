@@ -8,7 +8,7 @@ namespace Moguta.ApiClient.Models.Common;
 /// Представляет сущность "Пользователь" в MogutaCMS.
 /// Основано на документации для методов getUsers и importUsers.
 /// </summary>
-public class User
+public class MogutaUser
 {
     /// <summary>
     /// Получает или задает уникальный идентификатор пользователя.

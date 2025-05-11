@@ -6,7 +6,7 @@ namespace Moguta.ApiClient.Models.Requests;
 /// Параметры для API метода `getCategory`.
 /// Позволяет указать ID, URL или параметры пагинации. Следует использовать только одну группу параметров.
 /// </summary>
-public class GetCategoryRequestParams
+public class GetMogutaCategoryRequestParams
 {
     // Вариант 1: Пагинация
     /// <summary>

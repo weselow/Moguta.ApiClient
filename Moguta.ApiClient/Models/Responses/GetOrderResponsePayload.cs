@@ -20,7 +20,7 @@ public class GetOrderResponsePayload
     /// Получает список заказов для текущей страницы.
     /// </summary>
     [JsonPropertyName("orders")] // Имя из JSON
-    public List<Order> Orders { get; set; } = [];
+    public List<MogutaOrder> Orders { get; set; } = [];
 
     /// <summary>
     /// Получает номер текущей страницы (только при пагинации).
