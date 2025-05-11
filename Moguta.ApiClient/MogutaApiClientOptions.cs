@@ -48,4 +48,33 @@ public class MogutaApiClientOptions
     /// </summary>
     /// <value>Длительность таймаута запроса или <c>null</c> для использования значения по умолчанию.</value>
     public TimeSpan? RequestTimeout { get; set; }
+
+    /// <summary>
+    /// Количество заказов на страницу (максимум 100)
+    /// </summary>
+    public int MaxGetProductPerPageCount { get; set; } = 100;
+
+    /// <summary>
+    /// Максимальное количество товаров в одном запросе к API.
+    /// </summary>
+    public int MaxImportProductBachSize { get; set; } = 100;
+   
+
+    /// <summary>
+    /// Количество пользователей на страницу (максимум 250)
+    /// </summary>
+    public int MaxGetUsersPerPageCount { get; set; } = 250;
+    public int MaxImportUsersBatchSize { get; set; } = 100;
+
+    /// <summary>
+    ///  Количество категорий на страницу (максимум 250)
+    /// </summary>
+    public int MaxGetCategoryPerPageCount { get; set; } = 250;
+    public int MaxImportCategoryBatchSize { get; set; } = 100;
+
+    /// <summary>
+    /// Количество заказов на страницу (максимум 250)
+    /// </summary>
+    public int MaxGetOrderPerPageCount { get; set; } = 250;
+    public int MaxImportOrderBatchSize { get; set; } = 100;
 }

@@ -156,7 +156,7 @@ public class IntegrationUsersTests
         }
 
         // --- !!! ЗАМЕНИТЬ НА РЕАЛЬНЫЙ EMAIL !!! ---
-        string existingEmail = "user@moguta.ru"; // Пример, обязательно замените!
+        string existingEmail = "mail@server360.ru"; // Пример, обязательно замените!
         // ------------------------------------------
 
         _logger.LogInformation("Запуск теста FindUserAsync_RealApi_ShouldReturnExistingUser для email: {Email}...", existingEmail);

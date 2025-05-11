@@ -12,16 +12,18 @@ namespace Moguta.ApiClient.Abstractions;
 public interface IMogutaApiClient
 {
     #region Методы Товаров (Product)
+
     /// <summary>
     /// Импортирует (создает или обновляет) товары в MogutaCMS.
     /// </summary>
     /// <param name="products">Список объектов <see cref="Product"/> для импорта. Рекомендуется не более 100 за раз.</param>
+    /// <param name="batchSize">Количество товаров в одном запросе (max 100).</param>
     /// <param name="cancellationToken">Токен для отмены операции.</param>
     /// <returns>Задача, представляющая асинхронную операцию. Содержит строку ответа API с результатом (например, "Импортировано: 1 Обновлено: 0 Ошибок: 0").</returns>
     /// <exception cref="ArgumentException">Выбрасывается, если список товаров null или пуст.</exception>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<string?> ImportProductAsync(List<Product> products, CancellationToken cancellationToken = default);
+    Task<string?> ImportProductAsync(List<Product> products, int batchSize = 100, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Удаляет товары из MogutaCMS по их уникальным идентификаторам.

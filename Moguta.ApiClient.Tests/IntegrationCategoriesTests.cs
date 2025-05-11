@@ -130,7 +130,43 @@ public class IntegrationCategoriesTests
         _logger.LogInformation("Тест GetCategoriesAsync_RealApi_ShouldReturnCategories: Получено {Count} категорий.", categories.Count);
         Assert.True(categories.Count <= 50);
     }
-    
+
+    /// <summary>
+    /// Получаем категории, когда в запросе Count = null.
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task GetCategoriesAsync_RealApi_WithNullCount()
+    {
+        if (!_canRunIntegrationTests || _apiClient == null)
+        {
+            _logger.LogWarning("Пропуск теста GetCategoriesAsync_RealApi_ShouldReturnCategories: Конфигурация отсутствует.");
+            Assert.Fail("Пропуск интеграционного теста: Конфигурация MogutaApiIntegration не найдена или неполная.");
+            return;
+        }
+        _logger.LogInformation("Запуск теста GetCategoriesAsync_RealApi_ShouldReturnCategories...");
+
+        // Arrange
+        var requestParams = new GetCategoryRequestParams
+        {
+            Page = 1,
+            //Count = 50
+        };
+        List<Category>? categories = null;
+
+        // Act
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            categories = await _apiClient!.GetCategoryAsync(requestParams);
+        });
+
+        // Assert
+        if (exception != null) _logger.LogError(exception, "Тест GetCategoriesAsync_RealApi_ShouldReturnCategories провален.");
+        Assert.Null(exception);
+        Assert.NotNull(categories);
+        _logger.LogInformation("Тест GetCategoriesAsync_RealApi_ShouldReturnCategories: Получено {Count} категорий.", categories.Count);
+    }
+
     /// <summary>
     /// Проверяет полный цикл: создание, обновление и удаление категории через реальное API.
     /// Тест будет пропущен, если конфигурация не найдена.
@@ -239,4 +275,150 @@ public class IntegrationCategoriesTests
         _logger.LogInformation("Тест CreateUpdateDeleteCategoryAsync_RealApi_ShouldSucceed: Категория ID={CatId} успешно создана, обновлена и удалена.", createdCategoryId);
     }
 
+    /// <summary>
+    /// Удаляем все категории с сайта.
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task DeleteAllCategoriesAsync_RealApi_ShouldSucceed()
+    {
+        if (!_canRunIntegrationTests || _apiClient == null)
+        {
+            _logger.LogWarning("Пропуск теста CreateUpdateDeleteCategoryAsync_RealApi_ShouldSucceed: Конфигурация отсутствует.");
+            Assert.Fail("Пропуск интеграционного теста: Конфигурация MogutaApiIntegration не найдена или неполная.");
+            return;
+        }
+        // --- Arrange: Создание категории ---
+        var uniqueId = Guid.NewGuid().ToString("N").Substring(0, 8);
+        var initialCategory = new Category
+        {
+            Title = $"Тест Кат Созд {uniqueId}",
+            Url = $"test-cat-create-{uniqueId}",
+            Parent = 0,
+            Activity = true,
+            Invisible = false,
+            Export = true,
+            Sort = 1001
+        };
+        var createException = await Record.ExceptionAsync(async () =>
+        {
+            var importResult = await _apiClient!.ImportCategoryAsync([initialCategory]);
+            Assert.NotNull(importResult);
+            Assert.Contains("Импорт завершен", importResult, StringComparison.OrdinalIgnoreCase);
+            await Task.Delay(500);
+        });
+        Assert.Null(createException);
+
+        string? deleteResult = null;
+        var totalDelted = 0;
+        List<Category>? foundAfterDelete = null;
+        var searchParams = new GetCategoryRequestParams
+        {
+            Page = 1
+        };  
+
+        // --- Act 1: Удаление ---
+        var deleteException = await Record.ExceptionAsync(async () =>
+        {
+            while (true)
+            {
+                foundAfterDelete = await _apiClient!.GetCategoryAsync(searchParams);
+                if (foundAfterDelete == null || foundAfterDelete.Count == 0) break;
+                var ids = foundAfterDelete.Where(t => t.Id != null).Select(t => t.Id ?? 0).ToList();
+                deleteResult = await _apiClient!.DeleteCategoryAsync(ids);
+                totalDelted += ids.Count;
+                _logger.LogInformation("... удалено {amount} категорий / всего удалено {total} категорий ", ids.Count, totalDelted);
+                await Task.Delay(500);
+            } 
+        });
+
+        // --- Assert 3: Проверка удаления ---
+        if (deleteException != null) _logger.LogError(deleteException, "Этап удаления в тесте CreateUpdateDeleteCategory провален.");
+        Assert.Null(deleteException);
+        Assert.NotNull(deleteResult);
+        Assert.Contains("Удаление завершено", deleteResult, StringComparison.OrdinalIgnoreCase);
+        Assert.NotNull(foundAfterDelete);
+        Assert.Empty(foundAfterDelete);
+        _logger.LogInformation("Тест DeleteAllCategoriesAsync_RealApi_ShouldSucceed пройден.");
+    }
+
+    /// <summary>
+    /// Проверяет, умеет ли API сопоставлять категории по имени.
+    /// Создает категорию, изменяет поле (кроме имени), отправляет повторно и проверяет количество категорий с этим именем.
+    /// </summary>
+    [Fact]
+    public async Task MatchCategoryByNameAsync_RealApi_ShouldHandleDuplicateNames()
+    {
+        if (!_canRunIntegrationTests || _apiClient == null)
+        {
+            _logger.LogWarning("Пропуск теста MatchCategoryByNameAsync_RealApi_ShouldHandleDuplicateNames: Конфигурация отсутствует.");
+            Assert.Fail("Пропуск интеграционного теста: Конфигурация MogutaApiIntegration не найдена или неполная.");
+            return;
+        }
+
+        // --- Arrange: Создание категории ---
+        var uniqueId = Guid.NewGuid().ToString("N").Substring(0, 8);
+        var categoryName = $"Тест Категория {uniqueId}";
+        var categoryUrl = $"test-cat-{uniqueId}";
+        var initialCategory = new Category
+        {
+            Title = categoryName,
+            Url = categoryUrl,
+            Parent = 0,
+            Activity = true,
+            Invisible = false,
+            Export = true,
+            Sort = 1001
+        };
+
+        // --- Act 1: Создание категории ---
+        _logger.LogInformation("Создание категории с именем '{Name}'...", categoryName);
+        var createException1 = await Record.ExceptionAsync(async () =>
+        {
+            var importResult = await _apiClient!.ImportCategoryAsync(new List<Category> { initialCategory });
+            Assert.NotNull(importResult);
+            Assert.Contains("Импорт завершен", importResult, StringComparison.OrdinalIgnoreCase);
+        });
+        Assert.Null(createException1);
+
+        // --- Act 2: Изменение поля и повторное создание ---
+        initialCategory.Sort = 2002; // Изменяем поле Sort
+        _logger.LogInformation("Повторное создание категории с измененным полем Sort...");
+        var createException2 = await Record.ExceptionAsync(async () =>
+        {
+            var importResult = await _apiClient!.ImportCategoryAsync(new List<Category> { initialCategory });
+            Assert.NotNull(importResult);
+            Assert.Contains("Импорт завершен", importResult, StringComparison.OrdinalIgnoreCase);
+        });
+        Assert.Null(createException2);
+
+        // --- Act 3: Запрос категорий по имени ---
+        _logger.LogInformation("Запрос категорий с именем '{Name}' по url...", categoryName);
+        List<Category>? matchingCategories = null;
+        var fetchException = await Record.ExceptionAsync(async () =>
+        {
+            var requestParams = new GetCategoryRequestParams
+            {
+                Urls = new List<string> { categoryUrl }
+            };
+            matchingCategories = await _apiClient!.GetCategoryAsync(requestParams);
+        });
+        Assert.Null(fetchException);
+
+        // --- Assert: Проверка количества категорий ---
+        Assert.NotNull(matchingCategories);
+        Assert.Single(matchingCategories); // Ожидаем, что категория одна
+        _logger.LogInformation("Тест MatchCategoryByNameAsync_RealApi_ShouldHandleDuplicateNames успешно пройден.");
+
+        // --- Cleanup: Удаление созданной категории ---
+        _logger.LogInformation("Удаление созданной категории...");
+        var deleteException = await Record.ExceptionAsync(async () =>
+        {
+            var idsToDelete = matchingCategories!.Select(c => c.Id!.Value).ToList();
+            var deleteResult = await _apiClient!.DeleteCategoryAsync(idsToDelete);
+            Assert.NotNull(deleteResult);
+            Assert.Contains("Удаление завершено", deleteResult, StringComparison.OrdinalIgnoreCase);
+        });
+        Assert.Null(deleteException);
+    }
 }
