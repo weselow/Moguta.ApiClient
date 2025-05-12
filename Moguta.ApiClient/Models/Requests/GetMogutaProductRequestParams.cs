@@ -6,7 +6,7 @@ namespace Moguta.ApiClient.Models.Requests;
 /// Параметры для API метода `getProduct`.
 /// Позволяет указать ID, артикулы, названия или параметры пагинации. Следует использовать только одну группу параметров.
 /// </summary>
-public class GetProductRequestParams
+public class GetMogutaProductRequestParams
 {
     // Вариант 1: Пагинация
     /// <summary>

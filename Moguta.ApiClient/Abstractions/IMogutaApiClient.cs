@@ -46,7 +46,7 @@ public interface IMogutaApiClient
     /// <returns>Задача, представляющая асинхронную операцию. Содержит список объектов <see cref="MogutaProduct"/>, соответствующих критериям, или <c>null</c>, если ответ API пуст.</returns>
     /// <exception cref="MogutaApiException">Выбрасывается при ошибках на уровне API или сетевых проблемах.</exception>
     /// <exception cref="MogutaApiSignatureException">Выбрасывается при неверной подписи ответа (если проверка включена).</exception>
-    Task<List<MogutaProduct>?> GetProductAsync(GetProductRequestParams requestParams, CancellationToken cancellationToken = default);
+    Task<List<MogutaProduct>?> GetProductAsync(GetMogutaProductRequestParams requestParams, CancellationToken cancellationToken = default);
     #endregion
 
     #region Методы Категорий (Category)

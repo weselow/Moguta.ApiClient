@@ -362,24 +362,57 @@ public partial class MogutaApiClient : IMogutaApiClient
     }
 
     /// <inheritdoc />
-    public async Task<List<MogutaProduct>?> GetProductAsync(GetProductRequestParams requestParams, CancellationToken cancellationToken = default)
+    public async Task<List<MogutaProduct>?> GetProductAsync(GetMogutaProductRequestParams requestParams, CancellationToken cancellationToken = default)
     {
         if (requestParams.Count != null
             && requestParams.Count > _options.MaxGetProductPerPageCount) requestParams.Count = _options.MaxGetProductPerPageCount;
+        requestParams.Count ??= _options.MaxGetProductPerPageCount;
+        requestParams.Page ??= 1;
+
         _logger.LogInformation("Попытка получения товаров с параметрами: {@RequestParams}", requestParams);
         var products = new List<MogutaProduct>(); // <-- Возвращаем пустой список
 
-        while (true)
+        if (requestParams.Codes != null)
         {
-            var response = await SendApiRequestAsync(typeof(GetProductResponsePayload), "getProduct", requestParams, cancellationToken).ConfigureAwait(false);
-            var payload = response as GetProductResponsePayload;
-            if (payload == null) break;
-            products.AddRange(payload.Products);
+            //получаем по артикулам
+            var allCodes = requestParams.Codes.ToList();
+            foreach (var batch in DataHelper.SplitIntoBatches(allCodes, _options.MaxGetProductPerPageCount))
+            {
+                requestParams.Codes = batch;
+                var response = await SendApiRequestAsync(typeof(GetProductResponsePayload), "getProduct", requestParams, cancellationToken).ConfigureAwait(false);
+                var payload = response as GetProductResponsePayload;
+                if (payload == null) break;
+                products.AddRange(payload.Products);
+            }
+        }
+        else if (requestParams.Titles != null)
+        {
+            //получаем по названиям
+            var allTitles = requestParams.Titles.ToList();
+            foreach (var batch in DataHelper.SplitIntoBatches(allTitles, _options.MaxGetProductPerPageCount))
+            {
+                requestParams.Codes = batch;
+                var response = await SendApiRequestAsync(typeof(GetProductResponsePayload), "getProduct", requestParams, cancellationToken).ConfigureAwait(false);
+                var payload = response as GetProductResponsePayload;
+                if (payload == null) break;
+                products.AddRange(payload.Products);
+            }
+        }
+        else
+        {
+            //получаем постранично
+            while (true)
+            {
+                var response = await SendApiRequestAsync(typeof(GetProductResponsePayload), "getProduct", requestParams, cancellationToken).ConfigureAwait(false);
+                var payload = response as GetProductResponsePayload;
+                if (payload == null) break;
+                products.AddRange(payload.Products);
 
-            //если в ответе меньше товаров, чем запрашивали - то это последняя страница
-            if ((requestParams.Count != null && payload.Products.Count < requestParams.Count)
-                || payload.Products.Count < _options.MaxGetProductPerPageCount) break;
-            requestParams.Page++;
+                //если в ответе меньше товаров, чем запрашивали - то это последняя страница
+                if ((requestParams.Count != null && payload.Products.Count < requestParams.Count)
+                    || payload.Products.Count < _options.MaxGetProductPerPageCount) break;
+                requestParams.Page++;
+            }
         }
 
         _logger.LogInformation("Успешно получено {ProductCount} товаров.", products.Count);
@@ -392,23 +425,53 @@ public partial class MogutaApiClient : IMogutaApiClient
     /// <inheritdoc />
     public async Task<List<MogutaCategory>?> GetCategoryAsync(GetMogutaCategoryRequestParams requestParams, CancellationToken cancellationToken = default)
     {
-        if (requestParams.Count != null 
+        if (requestParams.Count != null
             && requestParams.Count > _options.MaxGetCategoryPerPageCount) requestParams.Count = _options.MaxGetCategoryPerPageCount;
+        requestParams.Count ??= _options.MaxGetCategoryPerPageCount;
+        requestParams.Page ??= 1;
 
         _logger.LogInformation("Попытка получения категорий с параметрами: {@RequestParams}", requestParams);
         var categories = new List<MogutaCategory>();
 
-        while (true)
+        if (requestParams.Ids != null)
         {
-            var response = await SendApiRequestAsync(typeof(GetCategoryResponsePayload), "getCategory", requestParams, cancellationToken).ConfigureAwait(false);
-            var payload = response as GetCategoryResponsePayload;
-            if (payload == null) break;
-            categories.AddRange(payload.Categories);
+            var list = requestParams.Ids.ToList();
+            foreach (var batch in DataHelper.SplitIntoBatches(list, _options.MaxGetCategoryPerPageCount))
+            {
+                requestParams.Ids = batch;
+                var response = await SendApiRequestAsync(typeof(GetCategoryResponsePayload), "getCategory", requestParams, cancellationToken).ConfigureAwait(false);
+                var payload = response as GetCategoryResponsePayload;
+                if (payload == null) break;
+                categories.AddRange(payload.Categories);
+            }
+        }
+        else if (requestParams.Urls != null)
+        {
+            var list = requestParams.Urls.ToList();
+            foreach (var batch in DataHelper.SplitIntoBatches(list, _options.MaxGetCategoryPerPageCount))
+            {
+                requestParams.Urls = batch;
+                var response = await SendApiRequestAsync(typeof(GetCategoryResponsePayload), "getCategory", requestParams, cancellationToken).ConfigureAwait(false);
+                var payload = response as GetCategoryResponsePayload;
+                if (payload == null) break;
+                categories.AddRange(payload.Categories);
+            }
+        }
+        else
+        {
+            //получаем постранично
+            while (true)
+            {
+                var response = await SendApiRequestAsync(typeof(GetCategoryResponsePayload), "getCategory", requestParams, cancellationToken).ConfigureAwait(false);
+                var payload = response as GetCategoryResponsePayload;
+                if (payload == null || payload.Categories.Count == 0) break;
+                categories.AddRange(payload.Categories);
 
-            //если в ответе меньше товаров, чем запрашивали - то это последняя страница
-            if ((requestParams.Count != null && payload.Categories.Count < requestParams.Count)
-                || payload.Categories.Count < _options.MaxGetCategoryPerPageCount) break;
-            requestParams.Page++;
+                //если в ответе меньше товаров, чем запрашивали - то это последняя страница
+                if ((requestParams.Count != null && payload.Categories.Count < requestParams.Count)
+                    || payload.Categories.Count < _options.MaxGetCategoryPerPageCount) break;
+                requestParams.Page++;
+            }
         }
 
         _logger.LogInformation("Успешно получено {CategoryCount} категорий.", categories.Count);
@@ -421,21 +484,21 @@ public partial class MogutaApiClient : IMogutaApiClient
         if (categories == null || categories.Count == 0)
             throw new ArgumentException("Импорт категорий: список категорий не может быть null или пустым.", nameof(categories));
 
-        if (categories.Any(t => string.IsNullOrEmpty(t.Url)))
-        {
-            var categoriesNames = categories.Where(t => string.IsNullOrEmpty(t.Url)).Select(t => t.Title).ToList();
-            throw new ArgumentException($"Список товаров содержит {categoriesNames.Count} товаров с пустым Url. Названия категорий: {string.Join(" | ", categoriesNames)}.", nameof(categories));
-        }
+        //if (categories.Any(t => string.IsNullOrEmpty(t.Url)))
+        //{
+        //    var categoriesNames = categories.Where(t => string.IsNullOrEmpty(t.Url)).Select(t => t.Title).ToList();
+        //    throw new ArgumentException($"Список товаров содержит {categoriesNames.Count} товаров с пустым Url. Названия категорий: {string.Join(" | ", categoriesNames)}.", nameof(categories));
+        //}
 
         // Ограничиваем размер пакета
         var batchSize = _options.MaxImportCategoryBatchSize;
         var result = string.Empty;
         var uniqueData = DataHelper.FilterAndGroupToUniqueLists(categories, p => p.Url);
-        if (uniqueData.Count > 0)
+        if (uniqueData.Count > 1)
         {
-            _logger.LogWarning("Импорт категорий: найдено {amount} дубликтов, они будут обновлены в процессе импорта.", uniqueData.Count);
+            _logger.LogWarning("Импорт категорий: найдено {amount} дубликтов, они будут обновлены в процессе импорта.", uniqueData.Count - 1);
         }
-        
+
         foreach (var cycle in uniqueData.Keys)
         {
             foreach (var batch in DataHelper.SplitIntoBatches(uniqueData[cycle], batchSize))

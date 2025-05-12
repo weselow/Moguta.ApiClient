@@ -110,7 +110,7 @@ public class IntegrationProductsTests
         _logger.LogInformation("Запуск теста GetProductAsync_RealApi_ShouldReturnProducts...");
 
         // Arrange
-        var requestParams = new GetProductRequestParams
+        var requestParams = new GetMogutaProductRequestParams
         {
             Page = 1,
             Count = 10,
@@ -187,7 +187,7 @@ public class IntegrationProductsTests
             Assert.NotNull(importResult);
             Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
             await Task.Delay(500);
-            var searchParams = new GetProductRequestParams { Codes = new List<string> { initialCode } };
+            var searchParams = new GetMogutaProductRequestParams { Codes = new List<string> { initialCode } };
             createdProductId = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault()?.Id;
         });
 
@@ -218,7 +218,7 @@ public class IntegrationProductsTests
         {
             updateResult = await _apiClient!.ImportProductAsync(new List<MogutaProduct> { productToUpdate });
             await Task.Delay(500);
-            var searchParams = new GetProductRequestParams { Ids = new List<long> { createdProductId.Value }, IncludeVariants = false, IncludeProperties = false }; // Ищем по ID
+            var searchParams = new GetMogutaProductRequestParams { Ids = new List<long> { createdProductId.Value }, IncludeVariants = false, IncludeProperties = false }; // Ищем по ID
             updatedProduct = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault();
         });
 
@@ -242,7 +242,7 @@ public class IntegrationProductsTests
         {
             deleteResult = await _apiClient!.DeleteProductAsync(new List<long> { createdProductId.Value });
             await Task.Delay(500);
-            var searchParamsCheck = new GetProductRequestParams { Ids = new List<long> { createdProductId.Value } }; // Ищем по ID удаленного
+            var searchParamsCheck = new GetMogutaProductRequestParams { Ids = new List<long> { createdProductId.Value } }; // Ищем по ID удаленного
             foundAfterDelete = await _apiClient!.GetProductAsync(searchParamsCheck);
         });
 
@@ -294,7 +294,7 @@ public class IntegrationProductsTests
             importResult = await _apiClient!.ImportProductAsync(productsToImport);
             await Task.Delay(1000);
 
-            var searchParams = new GetProductRequestParams
+            var searchParams = new GetMogutaProductRequestParams
             {
                 Codes = new List<string> { newProduct.Code },
                 IncludeVariants = true, // Запрашиваем варианты для проверки
@@ -344,7 +344,7 @@ public class IntegrationProductsTests
         {
             deleteResult = await _apiClient!.DeleteProductAsync(new List<long> { createdProductId.Value });
             await Task.Delay(500);
-            var searchParamsCheck = new GetProductRequestParams { Ids = new List<long> { createdProductId.Value } };
+            var searchParamsCheck = new GetMogutaProductRequestParams { Ids = new List<long> { createdProductId.Value } };
             foundAfterDelete = await _apiClient!.GetProductAsync(searchParamsCheck);
         });
 
@@ -403,7 +403,7 @@ public class IntegrationProductsTests
                 Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
 
                 await Task.Delay(1000); // Пауза для обработки
-                var searchParams = new GetProductRequestParams
+                var searchParams = new GetMogutaProductRequestParams
                 {
                     Codes = batch.Select(p => p.Code).ToList(),
                     IncludeVariants = false,
@@ -431,7 +431,7 @@ public class IntegrationProductsTests
             Assert.Contains("Удаление завершено", deleteResult, StringComparison.OrdinalIgnoreCase);
 
             await Task.Delay(500); // Пауза для обработки
-            var searchParams = new GetProductRequestParams { Ids = createdProductIds };
+            var searchParams = new GetMogutaProductRequestParams { Ids = createdProductIds };
             var foundAfterDelete = await _apiClient!.GetProductAsync(searchParams);
             Assert.NotNull(foundAfterDelete);
             Assert.Empty(foundAfterDelete);
@@ -485,7 +485,7 @@ public class IntegrationProductsTests
             Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
 
             await Task.Delay(500);
-            var searchParams = new GetProductRequestParams { Codes = new List<string> { initialCode } };
+            var searchParams = new GetMogutaProductRequestParams { Codes = new List<string> { initialCode } };
             createdProductId = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault()?.Id;
         });
 
@@ -513,7 +513,7 @@ public class IntegrationProductsTests
             Assert.Contains("импорт", updateResult, StringComparison.OrdinalIgnoreCase);
 
             await Task.Delay(500);
-            var searchParams = new GetProductRequestParams { Ids = new List<long> { createdProductId.Value } };
+            var searchParams = new GetMogutaProductRequestParams { Ids = new List<long> { createdProductId.Value } };
             updatedProduct = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault();
         });
 
@@ -577,7 +577,7 @@ public class IntegrationProductsTests
             Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
 
             await Task.Delay(500);
-            var searchParams = new GetProductRequestParams { Codes = new List<string> { initialCode } };
+            var searchParams = new GetMogutaProductRequestParams { Codes = new List<string> { initialCode } };
             createdProductId = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault()?.Id;
         });
 
@@ -604,7 +604,7 @@ public class IntegrationProductsTests
             Assert.Contains("импорт", updateResult, StringComparison.OrdinalIgnoreCase);
 
             await Task.Delay(500);
-            var searchParams = new GetProductRequestParams { Codes = new List<string> { initialCode } };
+            var searchParams = new GetMogutaProductRequestParams { Codes = new List<string> { initialCode } };
             updatedProduct = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault();
         });
 
@@ -671,7 +671,7 @@ public class IntegrationProductsTests
             Assert.Contains("импорт", importResult, StringComparison.OrdinalIgnoreCase);
 
             await Task.Delay(500);
-            var searchParams = new GetProductRequestParams { Codes = new List<string> { initialCode } };
+            var searchParams = new GetMogutaProductRequestParams { Codes = new List<string> { initialCode } };
             createdProductId = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault()?.Id;
         });
 
@@ -701,7 +701,7 @@ public class IntegrationProductsTests
             Assert.Contains("импорт", updateResult, StringComparison.OrdinalIgnoreCase);
 
             await Task.Delay(500);
-            var searchParams = new GetProductRequestParams { Ids = new List<long> { createdProductId.Value } };
+            var searchParams = new GetMogutaProductRequestParams { Ids = new List<long> { createdProductId.Value } };
             updatedProduct = (await _apiClient!.GetProductAsync(searchParams))?.FirstOrDefault();
         });
 
@@ -742,7 +742,7 @@ public class IntegrationProductsTests
         _logger.LogInformation("Запуск теста GetProductAsync_RealApi_ShouldReturnProducts...");
 
         // Arrange
-        var requestParams = new GetProductRequestParams
+        var requestParams = new GetMogutaProductRequestParams
         {
             Page = 1,
             IncludeVariants = true,

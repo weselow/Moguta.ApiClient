@@ -134,7 +134,7 @@ public class MogutaApiClientTests : IDisposable
     public async Task GetProductAsync_Success_ReturnsProductsAndValidatesSignature()
     {
         // Arrange
-        var requestParams = new GetProductRequestParams { Page = 1, Count = 2 };
+        var requestParams = new GetMogutaProductRequestParams { Page = 1, Count = 2 };
         var expectedProducts = new List<MogutaProduct> {
             new MogutaProduct { Id = 1, Title = "Товар 1", Code="P1", CatId=1, Url="p1", Price=10, Count=5, Activity=true },
             new MogutaProduct { Id = 2, Title = "Товар 2", Code="P2", CatId=1, Url="p2", Price=20, Count=10, Activity=true }
