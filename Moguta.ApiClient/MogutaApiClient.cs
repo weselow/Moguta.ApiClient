@@ -6,9 +6,7 @@ using Moguta.ApiClient.Infrastructure;
 using Moguta.ApiClient.Models.Common;
 using Moguta.ApiClient.Models.Requests;
 using Moguta.ApiClient.Models.Responses;
-using System.Net;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json; // Для JsonException и JsonElement
 
 namespace Moguta.ApiClient;
@@ -401,6 +399,7 @@ public partial class MogutaApiClient : IMogutaApiClient
         else
         {
             //получаем постранично
+            long maxId = 0;
             while (true)
             {
                 var response = await SendApiRequestAsync(typeof(GetProductResponsePayload), "getProduct", requestParams, cancellationToken).ConfigureAwait(false);
@@ -411,7 +410,15 @@ public partial class MogutaApiClient : IMogutaApiClient
                 //если в ответе меньше товаров, чем запрашивали - то это последняя страница
                 if ((requestParams.Count != null && payload.Products.Count < requestParams.Count)
                     || payload.Products.Count < _options.MaxGetProductPerPageCount) break;
+
+                if (maxId == products.Max(t => t.Id ?? 0))
+                {
+                    _logger.LogError("Могута глючит, отдает вторую страницу опять с одними и теми же Id");
+                    break;
+                }
+
                 requestParams.Page++;
+                maxId = products.Max(t => t.Id ?? 0);
             }
         }
 
@@ -460,6 +467,7 @@ public partial class MogutaApiClient : IMogutaApiClient
         else
         {
             //получаем постранично
+            long maxId = 0;
             while (true)
             {
                 var response = await SendApiRequestAsync(typeof(GetCategoryResponsePayload), "getCategory", requestParams, cancellationToken).ConfigureAwait(false);
@@ -470,7 +478,15 @@ public partial class MogutaApiClient : IMogutaApiClient
                 //если в ответе меньше товаров, чем запрашивали - то это последняя страница
                 if ((requestParams.Count != null && payload.Categories.Count < requestParams.Count)
                     || payload.Categories.Count < _options.MaxGetCategoryPerPageCount) break;
+
+                if (maxId == categories.Max(t => t.Id ?? 0))
+                {
+                    _logger.LogError("Могута глючит, отдает вторую страницу категорий опять с одними и теми же Id");
+                    break;
+                }
+
                 requestParams.Page++;
+                maxId = categories.Max(t => t.Id ?? 0);
             }
         }
 
