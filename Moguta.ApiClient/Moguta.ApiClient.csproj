@@ -13,7 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Resources\moguta-api-icon.ico" />
+    <Content Include="Resources\moguta-api-icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -47,8 +49,9 @@
     <None Update="nlog.config">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\moguta-api-icon-128x128.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Include="Resources\moguta-api-icon-128x128.png">
+      <Pack>True</Pack>
+      <PackagePath>Resources\</PackagePath>
     </None>
     <None Update="Resources\moguta-api-icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
