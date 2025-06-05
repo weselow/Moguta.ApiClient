@@ -1,4 +1,4 @@
-# Moguta.ApiClient .NET
+﻿# Moguta.ApiClient .NET
 
 Библиотека C#/.NET для взаимодействия с API MogutaCMS.
 

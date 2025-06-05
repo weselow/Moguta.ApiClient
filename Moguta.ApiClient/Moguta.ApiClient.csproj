@@ -6,8 +6,15 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <ApplicationIcon>Resources\moguta-api-icon.ico</ApplicationIcon>
+    <PackageProjectUrl>https://github.com/weselow/Moguta.ApiClient</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/weselow/Moguta.ApiClient</RepositoryUrl>
     <!-- Отключаем предупреждение о недостающих XML-комментариях для приватных членов -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\moguta-api-icon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Зависимости для HTTP клиента, DI, логирования и JSON -->
@@ -33,6 +40,28 @@
     <None Update="nlog.config">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\moguta-api-icon-128x128.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\moguta-api-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>Moguta.ApiClient</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Alexander Weselow</Authors>
+    <Company>Russian Software Developers, LLC</Company>
+    <Description>C# библиотека для работы с Moguta.CMS по API.</Description>
+    <RepositoryUrl>https://github.com/weselow/Moguta.ApiClient</RepositoryUrl>
+    <PackageTags>C# .NET Moguta MogutaCMS API Client HTTP REST CMS ECommerce Integration DependencyInjection Logging Async DTO JSON HttpClient ASPNET ASPNETCore</PackageTags>
+    <Title>Moguta.ApiClient</Title>
+    <PackageProjectUrl>https://github.com/weselow/Moguta.ApiClient</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>Resources/moguta-api-icon-128x128.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Alexander Weselow</Copyright>
+  </PropertyGroup>
 
 </Project>
