@@ -1,6 +1,6 @@
 ﻿# Moguta.ApiClient .NET
 
-![Icon](https://github.com/weselow/Moguta.ApiClient/blob/master/Moguta.ApiClient/Resources/moguta-api-icon.png)
+![Icon](https://github.com/weselow/Moguta.ApiClient/blob/master/Moguta.ApiClient/Resources/moguta-api-icon-128x128.png)
 Библиотека C#/.NET для взаимодействия с API MogutaCMS.
 
 ## Возможности
