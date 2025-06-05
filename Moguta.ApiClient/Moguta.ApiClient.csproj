@@ -36,6 +36,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Файл конфигурации NLog -->
     <None Update="nlog.config">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -62,6 +69,9 @@
     <PackageIcon>Resources/moguta-api-icon-128x128.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Alexander Weselow</Copyright>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
 
 </Project>
